@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Professor Eran Andrechek's website for his lab at Michigan State University where he does breast cancer research">
+    <title>Supplemental Data - Andrechek Lab</title>
+    <script type="application/ld+json">
+        {
+          "@context" : "https://schema.org",
+          "@type" : "WebSite",
+          "name" : "Andrechek Lab",
+          "url" : "https://lab.andrechek.com/"
+        }
+    </script>
+    <link type="text/css" rel="stylesheet" href="styles.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135647110-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-135647110-1');
+    </script>
+    <script>
+        $(document).ready(function() {
+            $(".navbar-burger").click(function() {
+                $(".navbar-burger").toggleClass("is-active");
+                $(".navbar-menu").toggleClass("is-active");
+            });
+        });
+    </script>
+</head>
+<body>
+<nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="https://lab.andrechek.com">
+            <div style="font-size: 36px; font-weight: bold; color: #18453B;">Andrechek Lab</div>
+        </a>
+        <a role="button" class="navbar-burger burger" style="color: #18453B; font-size: 22px;" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div class="navbar-menu" style="font-size: 22px;">
+        <div class="navbar-start">
+            <a class="navbar-item" href="/">
+                Home
+            </a>
+            <a class="navbar-item" href="/people">
+                People
+            </a>
+            <a class="navbar-item" href="/research">
+                Research
+            </a>
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    More
+                </a>
+                <div class="navbar-dropdown" style="font-size: 22px;">
+                    <a class="navbar-item" href="/publications">
+                        Publications
+                    </a>
+                    <a class="navbar-item" href="/data">
+                        Supplemental Data
+                    </a>
+                    <a class="navbar-item" href="/news">
+                        News and Events
+                    </a>
+                    <a class="navbar-item" href="/contacts">
+                        Contacts
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="navbar-end" style="font-size: 22px;">
+            <div class="navbar-item">
+                <a href="https://msu.edu"><img alt="msu.edu" style="max-height: none; height: 50px;" src="combowordsandsparty.png"></a>
+            </div>
+        </div>
+    </div>
+</nav>
+<br>
+<div class="columns is-centered">
+    <div class="column is-10-tablet is-full-mobile-only" style="margin: 0 15px 0 15px;">
+        <p class="subtitle">
+            Supplemental information as to the detailed methods to generate the genomic analysis is provided for manuscripts as outlined below. This is done to preserve transparancy in our research methods and to provide a resource for anyone to reproduce our data.
+        </p>
+        <br>
+        <h1 class="title is-5">
+            A Genomic Analysis of Mouse Models of Breast Cancer Reveals Molecular Features of Mouse Models and Relationships to Human Breast Cancer
+        </h1>
+        <p class="subtitle">Hollern and Andrechek</p>
+        <p class="subtitle is-6">
+            For this manuscript we have organized the various analyses performed on the database into links to zipped folders as described below and numbered according to their reference in the manuscript. Clicking on a link will begin the download of the zipped material to your computer.
+            <br>
+            <br>
+            <a href="AdditionalFile1.zip">Additional File 1 - PCA code for Matlab</a>
+            <br>
+            <br>
+            <a href="Additional_file_2.zip">Additional File 2 - Fold change values organized by mouse tumor model type comparing the mouse model to all other types of mouse models.</a>
+            <br>
+            <br>
+            <a href="Additional_File_3.zip">Additional File 3 - Fold change values organized by mouse tumor model type comparing the mouse model to normal mammary gland.</a>
+            <br>
+            <br>
+            <a href="AdditionalFile6.zip">Additional File 6 - Fold change for genes in clusters 1-4 from the manuscript and the gene ontology associated with each cluster.</a>
+            <br>
+            <br>
+            <a href="AdditionalFile7.zip">Additional File 7 - GSEA for clusters 1-4, each of the runs (C2, C3 etc.) is in a separate folder.</a>
+            <br>
+            <br>
+            <a href="AdditionalFile11.zip">Additional File 11 - GSEA for mouse models compared to all other models or to mammary gland development. Listed by model.</a>
+            <br>
+            <br>
+            <a href="AdditionalFile12.zip">Additional File 12 - PDFs of pathway predictions for each mouse model of breast cancer, folders exist for each mouse model.</a>
+        </p>
+        <br>
+        <h1 class="title is-5">
+            Myc with a T58A Mutation in a Mouse Model of Breast Cancer Reduces the Dependence on KRas Mutations and has Similarities to Claudin Low Human Breast Cancer
+        </h1>
+        <p class="subtitle">Hollern, Yuwanita and Andrechek</p>
+        <p class="subtitle is-6">
+            Input / Output Files and Parameters:
+            <br>
+            <br>
+            <a href="BFRM_Input_Files.zip">BFRM Input Files</a>
+            <br>
+            <br>
+            <a href="Pathway_Signatures.zip">Pathway Signatures</a>
+            <br>
+            <br>
+            <a href="Unsupervised_Hierarchical_Clustering.zip">Unsupervised Clustering</a>
+        </p>
+    </div>
+</div>
+<br>
+<br>
+</body>
+</html>
