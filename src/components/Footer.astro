@@ -1,0 +1,87 @@
+---
+import { site } from '../config/site';
+const year = new Date().getFullYear();
+const { contact, social } = site;
+---
+
+<footer class="site-footer">
+  <div class="container grid">
+    <div>
+      <p class="foot-name">{site.name}</p>
+      <p class="foot-muted">{contact.department}<br />{site.institution}</p>
+    </div>
+
+    <div>
+      <p class="foot-heading">Contact</p>
+      <p class="foot-muted">
+        {contact.address.join(' · ')}<br />
+        <a href={`mailto:${contact.email}`}>{contact.email}</a>
+      </p>
+    </div>
+
+    <div>
+      <p class="foot-heading">Connect</p>
+      <ul class="social">
+        <li>
+          <a href={social.bluesky} rel="me noopener" aria-label="Eran Andrechek on BlueSky">
+            <svg viewBox="0 0 600 530" width="20" height="20" aria-hidden="true" fill="currentColor"><path d="M135 75c66 50 137 151 163 205 26-54 97-155 163-205 48-36 125-64 125 24 0 18-10 148-16 169-21 73-95 91-161 80 115 20 145 85 81 150-120 123-173-31-187-66-2-5-4-7-4-2 0-5-2 0-4 2-14 35-67 189-187 66-64-65-34-130 81-150-66 11-140-7-161-80-6-21-16-151-16-169 0-88 77-60 125-24Z"/></svg>
+            <span>BlueSky</span>
+          </a>
+        </li>
+        <li>
+          <a href={social.linkedin} rel="me noopener" aria-label="Eran Andrechek on LinkedIn">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+            <span>LinkedIn</span>
+          </a>
+        </li>
+      </ul>
+      <p class="foot-muted">
+        <a href={site.msu.url}>{site.msu.name}</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="container foot-base">
+    <p>© {year} {site.name}, {site.institution}.</p>
+    <p>
+      <a href="https://github.com/Andrechek-Lab/Andrechek-Lab">Edit this site on GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 3rem;
+    background: var(--green-dark);
+    color: #d8e6e0;
+    padding-block: 2.5rem 1.5rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+  }
+  .foot-name { font-weight: 800; color: #fff; font-size: 1.15rem; }
+  .foot-heading {
+    font-weight: 700; color: #fff; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 0.78rem; margin-bottom: 0.5rem;
+  }
+  .foot-muted { color: #b9cfc7; font-size: 0.95rem; }
+  .site-footer a { color: #eaf3ef; text-decoration: underline; text-underline-offset: 2px; }
+  .site-footer a:hover { color: #fff; }
+  .social {
+    list-style: none; padding: 0; display: flex; gap: 1.25rem; margin-bottom: 0.75rem;
+  }
+  .social a {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    text-decoration: none; color: #eaf3ef; font-weight: 500;
+  }
+  .social a:hover { color: #fff; }
+  .foot-base {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem;
+    margin-top: 2rem; padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 0.85rem; color: #a9c2ba;
+  }
+  .foot-base a { color: #cfe0d9; }
+</style>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found">
+  <section class="section">
+    <div class="container notfound">
+      <p class="eyebrow">404</p>
+      <h1>Page not found</h1>
+      <p class="lede">Sorry, we couldn't find that page. It may have moved.</p>
+      <p><a class="btn" href="/">Back to home</a></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound { text-align: center; padding-block: 3rem; }
+  .lede { font-size: 1.15rem; color: var(--muted); margin: 0.5rem 0 1.5rem; }
+</style>

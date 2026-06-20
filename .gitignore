@@ -66,3 +66,11 @@ node_modules/
 .env
 
 .DS_Store
+
+# Astro
+dist/
+.astro/
+
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars

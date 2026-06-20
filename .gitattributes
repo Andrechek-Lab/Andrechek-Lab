@@ -1,2 +1,0 @@
-public/BFRM_Input_Files.zip filter=lfs diff=lfs merge=lfs -text
-public/Pathway_Signatures.zip filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,24 @@
+{
+  // Cloudflare Worker that serves the built Astro site (the ./dist folder) as
+  // static assets, with a small script in front (worker/index.ts) for markdown
+  // content negotiation and /data/* download redirects.
+  //
+  // Deploy is handled automatically by Cloudflare Workers Builds on merge to
+  // main — you normally don't run wrangler by hand. See docs/infrastructure.md.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "andrechek-lab",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "drop-trailing-slash",
+    // Required so the worker sees every request before the static-asset matcher,
+    // otherwise markdown negotiation only runs on 404s.
+    "run_worker_first": true
+  },
+  "observability": {
+    "enabled": true
+  }
+}

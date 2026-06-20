@@ -1,0 +1,7 @@
+# Single-package repo (no workspaces). Allow the native build scripts pnpm
+# needs: sharp (Astro's image pipeline), esbuild (bundler), workerd (local
+# Workers runtime for `wrangler dev`).
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true

@@ -1,0 +1,129 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import alumniGroup from '../assets/images/alumni-group.jpeg';
+
+const byOrder = (a: { data: { order: number } }, b: { data: { order: number } }) =>
+  a.data.order - b.data.order;
+
+const people = await getCollection('people');
+const pi = people.filter((p) => p.data.group === 'pi').sort(byOrder);
+const current = people.filter((p) => p.data.group === 'current').sort(byOrder);
+const alumni = people.filter((p) => p.data.group === 'alumni').sort(byOrder);
+
+// Pre-render the markdown bodies (PI bio + trainee blurbs).
+const piCards = await Promise.all(pi.map(async (p) => ({ entry: p, Content: (await render(p)).Content })));
+const currentCards = await Promise.all(
+  current.map(async (p) => ({ entry: p, Content: (await render(p)).Content }))
+);
+---
+
+<BaseLayout title="People" description="The people of the Andrechek Lab — principal investigator, current trainees, and alumni.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">People</p>
+      <h1>The lab</h1>
+
+      {piCards.map(({ entry, Content }) => (
+        <article class="pi">
+          {entry.data.photo && (
+            <Image class="pi__photo" src={entry.data.photo} alt={entry.data.name} width={320} height={320} />
+          )}
+          <div class="pi__body">
+            <h2>{entry.data.name}</h2>
+            <p class="role">{entry.data.title} · Department of Physiology, Michigan State University</p>
+            {entry.data.email && (
+              <p><a href={`mailto:${entry.data.email}`}>{entry.data.email}</a></p>
+            )}
+            <div class="prose"><Content /></div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <h2>Current trainees</h2>
+      <div class="grid">
+        {currentCards.map(({ entry, Content }) => (
+          <article class="card">
+            {entry.data.photo && (
+              <Image class="card__photo" src={entry.data.photo} alt={entry.data.name} width={160} height={160} />
+            )}
+            <div>
+              <h3>{entry.data.name}</h3>
+              {entry.data.title && <p class="role">{entry.data.title}</p>}
+              <div class="blurb"><Content /></div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Alumni</h2>
+      <Image class="alumni-photo" src={alumniGroup} alt="Andrechek Lab alumni" widths={[480, 800, 1200]} sizes="(max-width: 800px) 100vw, 800px" />
+      <ul class="alumni">
+        {alumni.map((p) => (
+          <li>
+            <span class="alumni__name">{p.data.name}</span>
+            {p.data.currentPosition && <span class="alumni__where"> — {p.data.currentPosition}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pi {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    align-items: start;
+  }
+  .pi__photo { border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; height: auto; }
+  .pi__body h2 { margin-bottom: 0.25rem; }
+  .role { color: var(--muted); font-weight: 600; margin-bottom: 0.5rem; }
+  .pi__body .prose { margin-top: 1rem; }
+  .pi__body .prose :global(p) { margin-bottom: 0.9rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .card {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1.1rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .card__photo { border-radius: 50%; width: 110px; height: 110px; object-fit: cover; }
+  .card h3 { font-size: 1.1rem; margin-bottom: 0.1rem; }
+  .card .role { font-size: 0.9rem; margin-bottom: 0.4rem; }
+  .card .blurb :global(p) { font-size: 0.95rem; color: var(--body); }
+
+  .alumni-photo { border-radius: var(--radius); box-shadow: var(--shadow); margin: 1.25rem 0 1.75rem; width: 100%; max-width: 800px; }
+  .alumni { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.6rem; }
+  .alumni li { padding: 0.6rem 0.9rem; background: var(--bg-alt); border-radius: var(--radius-sm); border-left: 3px solid var(--green); }
+  .alumni__name { font-weight: 700; color: var(--ink); }
+  .alumni__where { color: var(--muted); }
+
+  @media (max-width: 720px) {
+    .pi { grid-template-columns: 1fr; }
+    .pi__photo { max-width: 240px; }
+    .card { grid-template-columns: 84px 1fr; padding: 1rem; }
+    .card__photo { width: 84px; height: 84px; }
+  }
+</style>

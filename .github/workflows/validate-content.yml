@@ -1,0 +1,58 @@
+name: Validate site content
+
+# Runs on every pull request (including from forks) and on direct pushes to main.
+# It type-checks and builds the site, which validates every content file against
+# its schema. If something is wrong, the build fails BEFORE anything is published,
+# so the live site is never broken by a bad edit. GitHub emails the author of a
+# failed run automatically; the "Explain failure" step also writes a plain-English
+# summary you can read on the run page.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Build & validate content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check and build the site
+        run: |
+          set -o pipefail
+          pnpm run validate 2>&1 | tee /tmp/build.log
+
+      - name: Explain failure
+        if: failure()
+        run: |
+          {
+            echo "## ❌ The site did not build"
+            echo ""
+            echo "Your change can't be published yet — but **the live site is unaffected**; visitors still see the last working version."
+            echo ""
+            echo "This almost always means a content file is missing a required field or has a small formatting mistake (for example, a line that needs quotes around it, or a photo filename that doesn't match the file you added)."
+            echo ""
+            echo "Find the first line below that starts with **error** — it names the file and what's wrong:"
+            echo ""
+            echo '```'
+            tail -n 40 /tmp/build.log
+            echo '```'
+            echo ""
+            echo "Field-by-field help is in **docs/editing-content.md**. Fix the file, commit again to this same branch, and this check will re-run."
+          } >> "$GITHUB_STEP_SUMMARY"

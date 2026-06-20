@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Slideshow from '../components/Slideshow.astro';
+import BlueskyFeed from '../components/BlueskyFeed.astro';
+
+const home = (await getCollection('home'))[0];
+const { headline, intro, slides } = home.data;
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Andrechek Lab · Michigan State University</p>
+      <h1>{headline}</h1>
+      <p class="lede prose">{intro}</p>
+      <p class="hero-actions">
+        <a class="btn" href="/research">Explore our research</a>
+        <a class="btn btn--ghost" href="/people">Meet the lab</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container feature">
+      <div class="feature__main">
+        <Slideshow slides={slides} />
+      </div>
+      <div class="feature__side">
+        <BlueskyFeed />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero { background: linear-gradient(180deg, var(--green-tint), var(--bg)); padding-block: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 4vw, 2.5rem); }
+  .lede { font-size: 1.2rem; color: var(--body); margin-top: 1rem; max-width: 50rem; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+
+  .feature { display: grid; grid-template-columns: 1fr 22rem; gap: 2rem; align-items: start; }
+  @media (max-width: 900px) {
+    .feature { grid-template-columns: 1fr; }
+  }
+</style>

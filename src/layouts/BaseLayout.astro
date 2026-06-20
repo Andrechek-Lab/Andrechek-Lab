@@ -1,0 +1,86 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../config/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path (e.g. "/people") used for the canonical URL; defaults to the current page. */
+  ogImage?: string;
+}
+
+const { title, description = site.description, ogImage } = Astro.props;
+const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.institution}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImageUrl = ogImage ? new URL(ogImage, site.url).href : undefined;
+const { ga4, cloudflareToken } = site.analytics;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ResearchOrganization',
+  name: site.name,
+  url: site.url,
+  parentOrganization: { '@type': 'CollegeOrUniversity', name: site.institution, url: site.msu.url },
+  description: site.description,
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph / social cards -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title ?? site.name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Google Analytics (GA4) -->
+    {ga4 && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`}></script>
+        <script is:inline define:vars={{ ga4 }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', ga4);
+        </script>
+      </>
+    )}
+
+    <!-- Cloudflare Web Analytics (privacy-friendly; no cookies) -->
+    {cloudflareToken && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${cloudflareToken}"}`}
+      ></script>
+    )}
+
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

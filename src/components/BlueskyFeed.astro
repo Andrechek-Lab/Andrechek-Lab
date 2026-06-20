@@ -1,0 +1,98 @@
+---
+import { site } from '../config/site';
+const handle = site.blueskyHandle;
+const profileUrl = site.social.bluesky;
+---
+
+<aside class="bsky" data-handle={handle} aria-label="Latest posts on BlueSky">
+  <div class="bsky__head">
+    <h2>Latest from BlueSky</h2>
+    <a class="bsky__follow" href={profileUrl} rel="me noopener">Follow @{handle}</a>
+  </div>
+  <div class="bsky__feed" data-feed>
+    <p class="bsky__loading">Loading recent posts…</p>
+    <noscript><p><a href={profileUrl} rel="noopener">View Eran Andrechek's posts on BlueSky →</a></p></noscript>
+  </div>
+</aside>
+
+<script is:inline define:vars={{ handle, profileUrl }}>
+  (function () {
+    const root = document.querySelector('.bsky');
+    const feed = root && root.querySelector('[data-feed]');
+    if (!feed) return;
+
+    const API = 'https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed';
+    const url = `${API}?actor=${encodeURIComponent(handle)}&limit=20&filter=posts_no_replies`;
+
+    function timeAgo(iso) {
+      const d = new Date(iso), now = new Date();
+      const s = Math.round((now - d) / 1000);
+      const units = [['y', 31536000], ['mo', 2592000], ['d', 86400], ['h', 3600], ['m', 60]];
+      for (const [label, secs] of units) { if (s >= secs) return Math.floor(s / secs) + label; }
+      return 'now';
+    }
+    function postUrl(uri, h) {
+      const rkey = (uri || '').split('/').pop();
+      return `https://bsky.app/profile/${h}/post/${rkey}`;
+    }
+    function el(tag, cls, text) {
+      const n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    }
+
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then((r) => { if (!r.ok) throw new Error('feed'); return r.json(); })
+      .then((data) => {
+        const posts = (data.feed || [])
+          .filter((it) => !it.reason && it.post && it.post.record && it.post.record.text)
+          .slice(0, 4);
+        feed.innerHTML = '';
+        if (!posts.length) throw new Error('empty');
+        for (const it of posts) {
+          const p = it.post;
+          const card = el('a', 'bsky-post');
+          card.href = postUrl(p.uri, p.author.handle);
+          card.rel = 'noopener';
+          const meta = el('div', 'bsky-post__meta');
+          meta.append(el('span', 'bsky-post__name', p.author.displayName || p.author.handle));
+          meta.append(el('span', 'bsky-post__time', '· ' + timeAgo(p.record.createdAt)));
+          card.append(meta);
+          card.append(el('p', 'bsky-post__text', p.record.text));
+          const counts = el('div', 'bsky-post__counts');
+          counts.append(el('span', null, '♡ ' + (p.likeCount || 0)));
+          counts.append(el('span', null, '↻ ' + (p.repostCount || 0)));
+          card.append(counts);
+          feed.append(card);
+        }
+      })
+      .catch(() => {
+        feed.innerHTML = '';
+        const fallback = el('a', 'bsky__fallback', 'View recent posts on BlueSky →');
+        fallback.href = profileUrl;
+        fallback.rel = 'noopener';
+        feed.append(fallback);
+      });
+  })();
+</script>
+
+<style>
+  .bsky { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+  .bsky__head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .bsky__head h2 { font-size: 1.1rem; }
+  .bsky__follow { font-size: 0.85rem; font-weight: 600; }
+  .bsky__loading { color: var(--muted); font-size: 0.92rem; }
+  .bsky__feed { display: flex; flex-direction: column; gap: 0.75rem; }
+  :global(.bsky-post) {
+    display: block; background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0.8rem 0.9rem; color: var(--body);
+  }
+  :global(.bsky-post:hover) { border-color: var(--green); text-decoration: none; }
+  :global(.bsky-post__meta) { display: flex; gap: 0.4rem; align-items: baseline; margin-bottom: 0.25rem; }
+  :global(.bsky-post__name) { font-weight: 700; color: var(--ink); font-size: 0.92rem; }
+  :global(.bsky-post__time) { color: var(--muted); font-size: 0.82rem; }
+  :global(.bsky-post__text) { font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+  :global(.bsky-post__counts) { display: flex; gap: 1rem; color: var(--muted); font-size: 0.82rem; margin-top: 0.4rem; }
+  .bsky__fallback { font-weight: 600; }
+</style>

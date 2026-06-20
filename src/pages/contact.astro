@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
+const { contact } = site;
+---
+
+<BaseLayout title="Contact" description="Contact information for the Andrechek Lab at Michigan State University.">
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Contact</p>
+      <h1>Get in touch</h1>
+
+      <div class="card">
+        <p class="name">{contact.name}</p>
+        <p class="role">{contact.title} · {contact.department}<br />{contact.institution}</p>
+        <address>
+          {contact.address.map((line) => (<span>{line}<br /></span>))}
+        </address>
+        <p class="lines">
+          <a href={`mailto:${contact.email}`}>{contact.email}</a><br />
+          {contact.phones.map((p) => (
+            <span><a href={`tel:${p.number.replace(/[^0-9]/g, '')}`}>{p.number}</a> ({p.label})<br /></span>
+          ))}
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .card {
+    margin-top: 1.5rem; max-width: 32rem;
+    background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--green);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 1.75rem;
+  }
+  .name { font-size: 1.3rem; font-weight: 800; color: var(--ink); }
+  .role { color: var(--muted); font-weight: 600; margin: 0.25rem 0 1rem; }
+  address { font-style: normal; color: var(--body); margin-bottom: 1rem; }
+  .lines { line-height: 1.9; }
+</style>
