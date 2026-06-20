@@ -5,60 +5,100 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const all = (await getCollection('news')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const coverage = all.filter((n) => n.data.type === 'coverage');
 const events = all.filter((n) => n.data.type === 'event');
-
-const fmt = (d: Date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(d);
+const fmt = (d: Date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
 ---
 
 <BaseLayout title="News & Events" description="News coverage and lab events from the Andrechek Lab.">
   <section class="section">
-    <div class="container prose-wide">
+    <div class="container">
       <p class="eyebrow">News &amp; Events</p>
       <h1>News &amp; Events</h1>
+      <p class="lede prose">Press coverage of the lab's research, and milestones from the group.</p>
 
-      <h2>News coverage</h2>
-      <ul class="news">
-        {coverage.map((n) => (
-          <li>
-            <time datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
-            <p class="news__title">
-              {n.data.url ? <a href={n.data.url} rel="noopener">{n.data.title}</a> : n.data.title}
-              {n.data.source && <span class="news__source"> · {n.data.source}</span>}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <div class="news-grid">
+        <div class="news-main">
+          <div class="section-head"><p class="eyebrow">In the news</p><h2>Press coverage</h2></div>
+          <ul class="coverage">
+            {coverage.map((n) => (
+              <li class="story">
+                <div class="story__meta">
+                  <time class="story__date" datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
+                  {n.data.source && <span class="story__outlet">{n.data.source}</span>}
+                </div>
+                <h3 class="story__title">
+                  {n.data.url ? <a href={n.data.url} rel="noopener">{n.data.title}</a> : n.data.title}
+                </h3>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <h2 class="events-h">Lab events</h2>
-      <ul class="news">
-        {events.map((n) => (
-          <li>
-            <time datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
-            <p class="news__title">{n.data.title}</p>
-          </li>
-        ))}
-      </ul>
+        <aside class="news-side">
+          <div class="section-head"><p class="eyebrow">From the lab</p><h2>Milestones</h2></div>
+          <ol class="events">
+            {events.map((n) => (
+              <li class="event">
+                <time class="event__date" datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
+                <p class="event__title">{n.data.title}</p>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .prose-wide { max-width: 56rem; }
-  h2 { margin-top: 2rem; }
-  .events-h { margin-top: 2.5rem; }
-  .news { list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-direction: column; }
-  .news li {
-    display: grid;
-    grid-template-columns: 11rem 1fr;
-    gap: 1rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid var(--border);
-    align-items: baseline;
+  .lede { font-size: 1.15rem; margin: 0.75rem 0 0; }
+  .news-grid {
+    display: grid; grid-template-columns: 1.7fr 1fr; gap: clamp(2rem, 5vw, 4rem);
+    margin-top: 2.5rem; align-items: start;
   }
-  .news time { color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
-  .news__title { font-size: 1.05rem; font-weight: 600; color: var(--ink); }
-  .news__source { color: var(--muted); font-weight: 500; font-size: 0.9rem; }
+  .section-head { margin-bottom: 1.25rem; }
+  .section-head h2 { margin-top: 0.4rem; font-size: 1.4rem; }
 
-  @media (max-width: 600px) {
-    .news li { grid-template-columns: 1fr; gap: 0.2rem; }
+  /* Coverage cards */
+  .coverage { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1rem; }
+  .story {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--border-strong);
+    border-radius: var(--radius); padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  }
+  .story:hover { border-left-color: var(--brand); box-shadow: var(--shadow); transform: translateY(-2px); }
+  .story__meta { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.45rem; }
+  .story__date { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .story__outlet {
+    font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--brand); padding: 0.15rem 0.5rem; border: 1px solid var(--border-strong); border-radius: 999px;
+  }
+  .story__title { font-size: 1.12rem; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
+  .story__title a { color: var(--ink); }
+  .story__title a:hover { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Events rail */
+  .news-side {
+    position: sticky; top: calc(var(--header-h) + 1.5rem);
+    background: var(--bg-alt); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.5rem;
+  }
+  .events { list-style: none; padding: 0; margin: 0; }
+  .event {
+    position: relative; padding: 0 0 1.1rem 1.4rem; border-left: 2px solid var(--border); margin-left: 0.25rem;
+  }
+  .event:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .event::before {
+    content: ''; position: absolute; left: -6px; top: 0.3rem;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--brand);
+  }
+  .event__date { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+  .event__title { font-weight: 600; color: var(--ink); font-size: 0.98rem; margin-top: 0.15rem; }
+
+  @media (max-width: 820px) {
+    .news-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .news-side { position: static; }
   }
 </style>

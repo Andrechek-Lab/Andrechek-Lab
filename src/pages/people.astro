@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
 import alumniGroup from '../assets/images/alumni-group.jpeg';
 
 const byOrder = (a: { data: { order: number } }, b: { data: { order: number } }) =>
@@ -32,9 +33,9 @@ const currentCards = await Promise.all(
           )}
           <div class="pi__body">
             <h2>{entry.data.name}</h2>
-            <p class="role">{entry.data.title} · Department of Physiology, Michigan State University</p>
+            <p class="pi__role">{entry.data.title} · {site.contact.department}, {site.institution}</p>
             {entry.data.email && (
-              <p><a href={`mailto:${entry.data.email}`}>{entry.data.email}</a></p>
+              <p class="pi__email"><a href={`mailto:${entry.data.email}`}>{entry.data.email}</a></p>
             )}
             <div class="prose"><Content /></div>
           </div>
@@ -45,18 +46,23 @@ const currentCards = await Promise.all(
 
   <section class="section section--alt">
     <div class="container">
-      <h2>Current trainees</h2>
-      <div class="grid">
+      <div class="section-head">
+        <p class="eyebrow">{current.length} researchers</p>
+        <h2>Current trainees</h2>
+      </div>
+      <div class="roster">
         {currentCards.map(({ entry, Content }) => (
-          <article class="card">
-            {entry.data.photo && (
-              <Image class="card__photo" src={entry.data.photo} alt={entry.data.name} width={160} height={160} />
-            )}
-            <div>
-              <h3>{entry.data.name}</h3>
-              {entry.data.title && <p class="role">{entry.data.title}</p>}
-              <div class="blurb"><Content /></div>
+          <article class="member">
+            <div class="member__head">
+              {entry.data.photo && (
+                <Image class="member__avatar" src={entry.data.photo} alt={entry.data.name} width={160} height={160} />
+              )}
+              <div class="member__id">
+                <h3 class="member__name">{entry.data.name}</h3>
+                {entry.data.title && <p class="member__title">{entry.data.title}</p>}
+              </div>
             </div>
+            <div class="member__blurb"><Content /></div>
           </article>
         ))}
       </div>
@@ -65,13 +71,19 @@ const currentCards = await Promise.all(
 
   <section class="section">
     <div class="container">
-      <h2>Alumni</h2>
-      <Image class="alumni-photo" src={alumniGroup} alt="Andrechek Lab alumni" widths={[480, 800, 1200]} sizes="(max-width: 800px) 100vw, 800px" />
+      <div class="section-head">
+        <p class="eyebrow">Where they are now</p>
+        <h2>Alumni</h2>
+      </div>
+      <figure class="alumni-figure">
+        <Image class="alumni-photo" src={alumniGroup} alt="Andrechek Lab alumni" widths={[400, 700]} sizes="(max-width: 520px) 100vw, 440px" />
+        <figcaption>Andrechek Lab alumni</figcaption>
+      </figure>
       <ul class="alumni">
         {alumni.map((p) => (
-          <li>
+          <li class="alumni__item">
             <span class="alumni__name">{p.data.name}</span>
-            {p.data.currentPosition && <span class="alumni__where"> — {p.data.currentPosition}</span>}
+            {p.data.currentPosition && <span class="alumni__where">{p.data.currentPosition}</span>}
           </li>
         ))}
       </ul>
@@ -80,50 +92,97 @@ const currentCards = await Promise.all(
 </BaseLayout>
 
 <style>
+  /* ---- Principal investigator ---- */
   .pi {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
-    margin-top: 1.5rem;
+    grid-template-columns: 300px 1fr;
+    gap: 2.5rem;
+    margin-top: 1.75rem;
     align-items: start;
   }
-  .pi__photo { border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; height: auto; }
-  .pi__body h2 { margin-bottom: 0.25rem; }
-  .role { color: var(--muted); font-weight: 600; margin-bottom: 0.5rem; }
-  .pi__body .prose { margin-top: 1rem; }
-  .pi__body .prose :global(p) { margin-bottom: 0.9rem; }
+  .pi__photo {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+  }
+  .pi__body h2 { margin-bottom: 0.4rem; }
+  .pi__role {
+    font-family: var(--font-mono);
+    font-size: 0.82rem; letter-spacing: 0.02em;
+    color: var(--accent); margin-bottom: 0.5rem;
+  }
+  .pi__email { margin-bottom: 1rem; }
+  .pi__body .prose :global(p) { margin-bottom: 0.95rem; max-width: 42rem; }
 
-  .grid {
+  /* ---- Current trainees ---- */
+  .roster {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
+    gap: 1.25rem;
   }
-  .card {
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 1.1rem;
-    background: #fff;
+  .member {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 1.25rem;
+    padding: 1.4rem;
     box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
   }
-  .card__photo { border-radius: 50%; width: 110px; height: 110px; object-fit: cover; }
-  .card h3 { font-size: 1.1rem; margin-bottom: 0.1rem; }
-  .card .role { font-size: 0.9rem; margin-bottom: 0.4rem; }
-  .card .blurb :global(p) { font-size: 0.95rem; color: var(--body); }
+  .member:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: var(--border-strong); }
+  .member__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .member__avatar {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: none;
+    box-shadow: 0 0 0 3px var(--brand-tint);
+  }
+  .member__name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; }
+  .member__title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--accent); margin-top: 0.3rem;
+  }
+  .member__blurb { color: var(--body); }
+  .member__blurb :global(p) { font-size: 0.95rem; }
+  .member__blurb :global(p + p) { margin-top: 0.6rem; }
 
-  .alumni-photo { border-radius: var(--radius); box-shadow: var(--shadow); margin: 1.25rem 0 1.75rem; width: 100%; max-width: 800px; }
-  .alumni { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.6rem; }
-  .alumni li { padding: 0.6rem 0.9rem; background: var(--bg-alt); border-radius: var(--radius-sm); border-left: 3px solid var(--green); }
-  .alumni__name { font-weight: 700; color: var(--ink); }
-  .alumni__where { color: var(--muted); }
+  /* ---- Alumni ---- */
+  .alumni-figure { max-width: 440px; margin: 0.5rem 0 2.25rem; }
+  .alumni-photo { border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; }
+  .alumni-figure figcaption {
+    font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted); margin-top: 0.6rem;
+  }
+  .alumni {
+    list-style: none; padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 0 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .alumni__item {
+    display: flex; flex-direction: column; gap: 0.1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .alumni__name { font-weight: 600; color: var(--ink); }
+  .alumni__where { color: var(--muted); font-size: 0.9rem; }
 
   @media (max-width: 720px) {
-    .pi { grid-template-columns: 1fr; }
-    .pi__photo { max-width: 240px; }
-    .card { grid-template-columns: 84px 1fr; padding: 1rem; }
-    .card__photo { width: 84px; height: 84px; }
+    .pi { grid-template-columns: 1fr; gap: 1.5rem; }
+    .pi__photo { max-width: 220px; position: static; }
   }
 </style>

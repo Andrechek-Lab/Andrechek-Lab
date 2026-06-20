@@ -1,0 +1,312 @@
+---
+import { site } from '../config/site';
+const handle = site.blueskyHandle;
+const profileUrl = site.social.bluesky;
+const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
+---
+
+<section class="bsky" aria-label="Latest posts on BlueSky">
+  <div class="bsky__head">
+    <p class="eyebrow">Updates</p>
+    <h2 class="bsky__title">Latest from Bluesky</h2>
+
+    <!-- Profile / follow strip. Counts + avatar are filled in by JS from the
+         public AT-Protocol profile; the link + label work without JS. -->
+    <div class="bsky__profile">
+      <img class="bsky__avatar" data-avatar alt="" width="52" height="52" decoding="async" loading="lazy" hidden />
+      <div class="bsky__who">
+        <span class="bsky__name" data-name>{displayName}</span>
+        <span class="bsky__stat" data-stat>@{handle.replace(/\.bsky\.social$/, '')}</span>
+      </div>
+      <a class="bsky__follow" href={profileUrl} rel="me noopener">
+        <svg viewBox="0 0 600 530" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M135 75c66 50 137 151 163 205 26-54 97-155 163-205 48-36 125-64 125 24 0 18-10 148-16 169-21 73-95 91-161 80 115 20 145 85 81 150-120 123-173-31-187-66-2-5-4-7-4-2 0-5-2 0-4 2-14 35-67 189-187 66-64-65-34-130 81-150-66 11-140-7-161-80-6-21-16-151-16-169 0-88 77-60 125-24Z"/></svg>
+        <span>Follow on Bluesky</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="bsky__list" data-embeds aria-busy="true">
+    <noscript><p><a href={profileUrl} rel="noopener">View posts on BlueSky →</a></p></noscript>
+  </div>
+
+  <div class="bsky__more-wrap">
+    <button class="btn btn--ghost bsky__more" data-more hidden>Show more posts</button>
+  </div>
+</section>
+
+<script is:inline data-astro-rerun define:vars={{ handle }}>
+  (function () {
+    const root = document.querySelector('.bsky');
+    const listEl = root && root.querySelector('[data-embeds]');
+    const moreBtn = root && root.querySelector('[data-more]');
+    if (!listEl || !moreBtn) return;
+
+    const HOST = 'https://public.api.bsky.app/xrpc';
+    const feedUrl = `${HOST}/app.bsky.feed.getAuthorFeed?actor=${encodeURIComponent(handle)}&limit=30&filter=posts_no_replies`;
+    const profUrl = `${HOST}/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`;
+    const compact = (n) => new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+
+    // ---- Profile strip (authority: avatar + follower / post counts) ----
+    fetch(profUrl, { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p) => {
+        if (!p) return;
+        const av = root.querySelector('[data-avatar]');
+        if (p.avatar && av) { av.src = p.avatar; av.hidden = false; av.alt = `${p.displayName || handle} avatar`; }
+        if (p.displayName) root.querySelector('[data-name]').textContent = p.displayName;
+        const bits = [];
+        if (typeof p.followersCount === 'number') bits.push(`${compact(p.followersCount)} followers`);
+        if (typeof p.postsCount === 'number') bits.push(`${compact(p.postsCount)} posts`);
+        if (bits.length) root.querySelector('[data-stat]').textContent = bits.join(' · ');
+      })
+      .catch(() => {});
+
+    // ---- Posts: masonry of native embeds, hydrated per-card on scroll ----
+    const step = () => Math.max(4, curCols * 2);
+    let posts = [], shown = 0, cells = [], columns = [], curCols = 0, started = false;
+    const cellData = new WeakMap();
+
+    function colCount() {
+      const w = listEl.clientWidth || window.innerWidth;
+      const target = 330, gap = 20;
+      return Math.max(1, Math.min(3, Math.floor((w + gap) / (target + gap))));
+    }
+
+    function buildColumns(n) {
+      listEl.innerHTML = '';
+      columns = [];
+      for (let i = 0; i < n; i++) {
+        const c = document.createElement('div');
+        c.className = 'bsky__col';
+        listEl.appendChild(c);
+        columns.push(c);
+      }
+      curCols = n;
+    }
+
+    function shortestCol() {
+      let best = columns[0], bh = Infinity;
+      for (const c of columns) { const h = c.offsetHeight; if (h < bh) { bh = h; best = c; } }
+      return best;
+    }
+
+    // Reinject the embed script (debounced) so it converts any blockquotes that
+    // have just been added; already-hydrated ones are skipped.
+    let embedT;
+    function scheduleEmbed() {
+      clearTimeout(embedT);
+      embedT = setTimeout(() => {
+        document.getElementById('bsky-embed-js')?.remove();
+        const s = document.createElement('script');
+        s.id = 'bsky-embed-js'; s.async = true;
+        s.src = 'https://embed.bsky.app/static/embed.js';
+        document.body.appendChild(s);
+      }, 120);
+    }
+
+    function fillSkeletons() {
+      buildColumns(colCount());
+      for (let i = 0; i < curCols * 2; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'bsky__cell';
+        cell.innerHTML = '<div class="bsky__skel" aria-hidden="true"></div>';
+        columns[i % curCols].appendChild(cell);
+      }
+    }
+
+    function blockquote(p) {
+      const rkey = (p.uri || '').split('/').pop();
+      const postUrl = `https://bsky.app/profile/${p.author.handle}/post/${rkey}?ref_src=embed`;
+      const bq = document.createElement('blockquote');
+      bq.className = 'bluesky-embed';
+      bq.setAttribute('data-bluesky-uri', p.uri);
+      bq.setAttribute('data-bluesky-cid', p.cid);
+      bq.appendChild(Object.assign(document.createElement('p'), { textContent: p.record.text }));
+      bq.appendChild(document.createTextNode(` — ${p.author.displayName || p.author.handle} `));
+      const a = document.createElement('a');
+      a.href = postUrl; a.textContent = 'view on Bluesky';
+      bq.appendChild(a);
+      return bq;
+    }
+
+    // Per-card lazy: a card stays a lightweight skeleton until it nears the
+    // viewport, then we drop in its (heavy) embed iframe.
+    const cardIO = ('IntersectionObserver' in window)
+      ? new IntersectionObserver((entries) => {
+          for (const e of entries) if (e.isIntersecting) { cardIO.unobserve(e.target); activate(e.target); }
+        }, { rootMargin: '500px 0px' })
+      : null;
+
+    function activate(cell) {
+      if (cell.dataset.active) return;
+      const p = cellData.get(cell);
+      if (!p) return;
+      cell.dataset.active = '1';
+      cell.innerHTML = '';
+      cell.appendChild(blockquote(p));
+      scheduleEmbed();
+    }
+
+    function buildCell(p) {
+      const cell = document.createElement('div');
+      cell.className = 'bsky__cell';
+      cell.innerHTML = '<div class="bsky__skel" aria-hidden="true"></div>';
+      cellData.set(cell, p);
+      return cell;
+    }
+
+    function renderNext() {
+      const n = step();
+      for (const p of posts.slice(shown, shown + n)) {
+        const cell = buildCell(p);
+        shortestCol().appendChild(cell);
+        cells.push(cell);
+        if (cardIO) cardIO.observe(cell); else activate(cell);
+      }
+      shown = Math.min(shown + n, posts.length);
+      moreBtn.hidden = shown >= posts.length;
+    }
+
+    function relayout() {
+      const n = colCount();
+      if (n === curCols || !cells.length) return;
+      buildColumns(n);
+      cells.forEach((cell) => shortestCol().appendChild(cell));
+      scheduleEmbed();
+    }
+    let rt;
+    window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(relayout, 160); });
+
+    function start() {
+      if (started) return;
+      started = true;
+      fetch(feedUrl, { headers: { Accept: 'application/json' } })
+        .then((r) => { if (!r.ok) throw new Error('feed'); return r.json(); })
+        .then((data) => {
+          posts = (data.feed || [])
+            .filter((it) => !it.reason && it.post && it.post.record && it.post.record.text)
+            .map((it) => it.post)
+            .slice(0, 10);
+          if (!posts.length) throw new Error('empty');
+          buildColumns(colCount());
+          renderNext();
+          moreBtn.addEventListener('click', renderNext);
+          listEl.removeAttribute('aria-busy');
+        })
+        .catch(() => {
+          listEl.innerHTML = '';
+          const a = document.createElement('a');
+          a.className = 'bsky__fallback'; a.rel = 'noopener';
+          a.href = root.querySelector('.bsky__follow')?.getAttribute('href') || `https://bsky.app/profile/${handle}`;
+          a.textContent = 'View recent posts on BlueSky →';
+          listEl.appendChild(a);
+          listEl.removeAttribute('aria-busy');
+        });
+    }
+
+    fillSkeletons();
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) { io.disconnect(); start(); }
+      }, { rootMargin: '800px 0px' });
+      io.observe(root);
+    } else {
+      start();
+    }
+  })();
+</script>
+
+<style>
+  .bsky__head { margin-bottom: 1.9rem; }
+  .bsky__title { margin-top: 0.5rem; }
+
+  /* Profile / follow strip */
+  .bsky__profile {
+    display: flex; align-items: center; gap: 0.85rem;
+    margin-top: 1.25rem; flex-wrap: wrap;
+  }
+  .bsky__avatar {
+    width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+    border: 1px solid var(--border); background: var(--bg-alt); flex: none;
+  }
+  .bsky__who { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+  .bsky__name { font-family: var(--font-display); font-weight: 600; color: var(--ink); font-size: 1.08rem; }
+  .bsky__stat { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .bsky__follow {
+    --bsky-blue: #0085ff;
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--bsky-blue); color: #fff;
+    padding: 0.6rem 1.15rem; border-radius: 999px;
+    font-weight: 600; font-size: 0.95rem; white-space: nowrap;
+    border: 1px solid var(--bsky-blue);
+    box-shadow: 0 1px 2px rgba(0, 60, 120, 0.18), 0 8px 20px -8px rgba(0, 110, 220, 0.5);
+    transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+  }
+  .bsky__follow:hover {
+    background: #0073e6; border-color: #0073e6; color: #fff; text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 60, 120, 0.2), 0 12px 26px -8px rgba(0, 110, 220, 0.6);
+  }
+  .bsky__follow svg { flex: none; }
+
+  /* Row of independent columns (cells/columns are built in JS — see global block). */
+  .bsky__list { display: flex; gap: 1.25rem; align-items: flex-start; min-height: 280px; }
+  .bsky__fallback { font-weight: 600; }
+  .bsky__more-wrap { display: flex; justify-content: center; margin-top: 1.75rem; }
+  .bsky__more[hidden] { display: none; }
+
+  @media (max-width: 560px) {
+    .bsky__follow { margin-left: 0; }
+  }
+</style>
+
+<style is:global>
+  .bsky .bsky__col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+  .bsky .bsky__cell { position: relative; }
+
+  /* While a post is loading, its blockquote is a sized shimmer placeholder so
+     the column keeps its height and doesn't collapse-then-jump. The embed
+     script injects its <iframe> *inside* this blockquote, so we must NOT hide
+     it — instead we strip the placeholder chrome once the iframe lands. */
+  .bsky .bsky__cell .bluesky-embed {
+    margin: 0 !important;
+    min-height: 280px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    color: transparent;
+    overflow: hidden;
+    background:
+      linear-gradient(100deg,
+        color-mix(in srgb, var(--ink) 3%, var(--surface)) 30%,
+        color-mix(in srgb, var(--ink) 9%, var(--surface)) 50%,
+        color-mix(in srgb, var(--ink) 3%, var(--surface)) 70%);
+    background-size: 220% 100%;
+    animation: bsky-shimmer 1.5s ease-in-out infinite;
+  }
+  .bsky .bsky__cell .bluesky-embed:has(iframe) {
+    min-height: 0; border: 0; overflow: visible;
+    color: inherit; background: none; animation: none;
+  }
+  .bsky .bsky__cell iframe { border-radius: var(--radius) !important; }
+
+  .bsky .bsky__skel {
+    min-height: 280px; border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(100deg,
+        color-mix(in srgb, var(--ink) 3%, var(--surface)) 30%,
+        color-mix(in srgb, var(--ink) 9%, var(--surface)) 50%,
+        color-mix(in srgb, var(--ink) 3%, var(--surface)) 70%);
+    background-size: 220% 100%;
+    animation: bsky-shimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes bsky-shimmer {
+    from { background-position: 220% 0; }
+    to { background-position: -120% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bsky .bsky__skel, .bsky .bsky__cell .bluesky-embed { animation: none; }
+  }
+</style>

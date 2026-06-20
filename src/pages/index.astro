@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Slideshow from '../components/Slideshow.astro';
-import BlueskyFeed from '../components/BlueskyFeed.astro';
+import BlueskyEmbed from '../components/BlueskyEmbed.astro';
 
 const home = (await getCollection('home'))[0];
 const { headline, intro, slides } = home.data;
@@ -10,36 +10,96 @@ const { headline, intro, slides } = home.data;
 
 <BaseLayout>
   <section class="hero">
-    <div class="container">
+    <div class="container hero__inner">
       <p class="eyebrow">Andrechek Lab · Michigan State University</p>
-      <h1>{headline}</h1>
+      <h1 class="hero__title">{headline}</h1>
       <p class="lede prose">{intro}</p>
-      <p class="hero-actions">
+      <div class="hero-actions">
         <a class="btn" href="/research">Explore our research</a>
         <a class="btn btn--ghost" href="/people">Meet the lab</a>
+      </div>
+      <p class="hero__meta">
+        <span>Breast cancer genomics</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span>Department of Physiology</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span>East Lansing, MI</span>
       </p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container feature">
-      <div class="feature__main">
+  <section class="section showcase">
+    <div class="container">
+      <div class="showcase__inner">
+        <p class="feature__label">Fig. 01 — From the bench</p>
         <Slideshow slides={slides} />
       </div>
-      <div class="feature__side">
-        <BlueskyFeed />
-      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <BlueskyEmbed />
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .hero { background: linear-gradient(180deg, var(--green-tint), var(--bg)); padding-block: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 4vw, 2.5rem); }
-  .lede { font-size: 1.2rem; color: var(--body); margin-top: 1rem; max-width: 50rem; }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, var(--brand-tint) 0%, transparent 70%),
+      var(--bg);
+    padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero__inner { position: relative; max-width: 56rem; }
+  .hero__title {
+    margin-top: 1.1rem;
+    font-size: clamp(2.4rem, 1.4rem + 4.4vw, 4.25rem);
+    font-weight: 500;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+  }
+  .lede {
+    font-size: clamp(1.12rem, 1.02rem + 0.5vw, 1.32rem);
+    color: var(--body);
+    margin-top: 1.35rem;
+    max-width: 42rem;
+  }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
 
-  .feature { display: grid; grid-template-columns: 1fr 22rem; gap: 2rem; align-items: start; }
-  @media (max-width: 900px) {
-    .feature { grid-template-columns: 1fr; }
+  .hero__meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem;
+    margin-top: 2.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .hero__meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border-strong); }
+
+  /* Staggered entrance — only on a fresh load (html lacks .vt-seen), never
+     replayed on in-session view-transition navigations. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not(.vt-seen)) .hero__inner > * { animation: rise 0.7s cubic-bezier(0.22, 0.68, 0.2, 1) backwards; }
+    :global(html:not(.vt-seen)) .hero__inner > *:nth-child(1) { animation-delay: 0.04s; }
+    :global(html:not(.vt-seen)) .hero__inner > *:nth-child(2) { animation-delay: 0.12s; }
+    :global(html:not(.vt-seen)) .hero__inner > *:nth-child(3) { animation-delay: 0.2s; }
+    :global(html:not(.vt-seen)) .hero__inner > *:nth-child(4) { animation-delay: 0.28s; }
+    :global(html:not(.vt-seen)) .hero__inner > *:nth-child(5) { animation-delay: 0.36s; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .showcase__inner { max-width: 60rem; margin-inline: auto; }
+  .feature__label {
+    font-family: var(--font-mono);
+    font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.85rem;
   }
 </style>

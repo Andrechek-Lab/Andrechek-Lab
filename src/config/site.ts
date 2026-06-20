@@ -27,8 +27,8 @@ export const site = {
     { label: 'People', href: '/people' },
     { label: 'Research', href: '/research' },
     { label: 'Publications', href: '/publications' },
-    { label: 'Supplemental Data', href: '/data' },
-    { label: 'News & Events', href: '/news' },
+    { label: 'Data', href: '/data' },
+    { label: 'News', href: '/news' },
     { label: 'Contact', href: '/contact' },
   ] as NavItem[],
 
@@ -37,6 +37,7 @@ export const site = {
     name: 'Eran Andrechek, PhD',
     title: 'Professor',
     department: 'Department of Physiology',
+    departmentUrl: 'https://physiology.natsci.msu.edu',
     institution: 'Michigan State University',
     address: ['2194 BPS Building', '567 Wilson Rd.', 'East Lansing, MI 48824'],
     email: 'andrech1@msu.edu',
@@ -50,6 +51,7 @@ export const site = {
   social: {
     bluesky: 'https://bsky.app/profile/eranandrechek.bsky.social',
     linkedin: 'https://www.linkedin.com/in/eran-andrechek-b706154b',
+    github: 'https://github.com/Andrechek-Lab',
   },
   // BlueSky handle used by the live-feed panel on the home page.
   blueskyHandle: 'eranandrechek.bsky.social',
@@ -69,3 +71,17 @@ export const site = {
 } as const;
 
 export type Site = typeof site;
+
+/**
+ * Append referral UTM params to an outbound link so the destination's analytics
+ * can see (and credit) traffic coming from this site. Pair with
+ * referrerpolicy="strict-origin-when-cross-origin" on the <a> so our domain is
+ * also sent as the HTTP referrer.
+ */
+export function withReferral(url: string, campaign = 'site'): string {
+  const u = new URL(url);
+  u.searchParams.set('utm_source', new URL(site.url).host);
+  u.searchParams.set('utm_medium', 'referral');
+  u.searchParams.set('utm_campaign', campaign);
+  return u.toString();
+}

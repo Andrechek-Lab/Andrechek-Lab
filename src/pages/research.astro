@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const areas = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
 const cards = await Promise.all(areas.map(async (a) => ({ entry: a, Content: (await render(a)).Content })));
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 ---
 
 <BaseLayout title="Research" description="Research in the Andrechek Lab integrates bioinformatics with mouse models of breast cancer to understand cancer initiation, progression, and metastasis.">
@@ -18,57 +19,76 @@ const cards = await Promise.all(areas.map(async (a) => ({ entry: a, Content: (aw
         cancer to ask what mechanisms drive normal tissue to become cancerous.
       </p>
 
-      <div class="areas">
-        {cards.map(({ entry, Content }, i) => (
-          <article class={`area ${i % 2 ? 'area--flip' : ''}`}>
-            <div class="area__media">
-              <Image src={entry.data.image} alt={entry.data.title} widths={[400, 700]} sizes="(max-width: 720px) 100vw, 400px" />
-            </div>
-            <div class="area__text">
-              <h2>{entry.data.title}</h2>
-              <p class="summary">{entry.data.summary}</p>
-              <details>
-                <summary>Read more</summary>
-                <div class="prose more"><Content /></div>
-              </details>
-            </div>
-          </article>
+      <nav class="jump" aria-label="Research areas">
+        {cards.map(({ entry }, i) => (
+          <a href={`#${slug(entry.data.title)}`}>
+            <span class="jump__num">{String(i + 1).padStart(2, '0')}</span>
+            {entry.data.title}
+          </a>
         ))}
-      </div>
+      </nav>
     </div>
   </section>
+
+  <div class="container areas">
+    {cards.map(({ entry, Content }, i) => (
+      <section class="area" id={slug(entry.data.title)}>
+        <div class="area__media">
+          <Image src={entry.data.image} alt={entry.data.title} widths={[400, 720]} sizes="(max-width: 760px) 100vw, 360px" />
+        </div>
+        <div class="area__text">
+          <p class="area__num">{String(i + 1).padStart(2, '0')}</p>
+          <h2>{entry.data.title}</h2>
+          <p class="summary">{entry.data.summary}</p>
+          <div class="prose body"><Content /></div>
+        </div>
+      </section>
+    ))}
+  </div>
 </BaseLayout>
 
 <style>
   .lede { font-size: 1.15rem; margin: 0.75rem 0 0; }
-  .areas { display: flex; flex-direction: column; gap: 2.5rem; margin-top: 2.5rem; }
+
+  /* Jump navigation */
+  .jump {
+    display: flex; flex-wrap: wrap; gap: 0.6rem;
+    margin-top: 1.75rem;
+  }
+  .jump a {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-size: 0.9rem; font-weight: 500; color: var(--brand);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .jump a:hover { background: var(--brand-tint); border-color: var(--brand); text-decoration: none; }
+  .jump__num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); }
+
+  /* Areas */
+  .areas { display: flex; flex-direction: column; gap: clamp(2.5rem, 5vw, 4rem); padding-bottom: clamp(2.5rem, 6vw, 5rem); }
   .area {
     display: grid;
     grid-template-columns: 360px 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
     align-items: start;
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--border);
   }
-  .area--flip { grid-template-columns: 1fr 360px; }
-  .area--flip .area__media { order: 2; }
+  .area__media { position: sticky; top: calc(var(--header-h) + 1.5rem); }
   .area__media img { border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; height: auto; }
-  .area h2 { margin-bottom: 0.5rem; }
-  .summary { font-size: 1.05rem; color: var(--body); }
-
-  details { margin-top: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.5rem; }
-  summary {
-    cursor: pointer; font-weight: 600; color: var(--green);
-    list-style: none; display: inline-flex; align-items: center; gap: 0.4rem;
+  .area__num {
+    font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 0.4rem;
   }
-  summary::-webkit-details-marker { display: none; }
-  summary::before { content: '+'; font-weight: 700; font-size: 1.1em; line-height: 1; }
-  details[open] summary::before { content: '–'; }
-  summary:hover { color: var(--green-bright); }
-  .more { margin-top: 0.75rem; }
-  .more :global(p) { margin-bottom: 0.85rem; }
+  .area h2 { margin-bottom: 0.6rem; }
+  .summary { font-size: 1.12rem; color: var(--ink); font-weight: 500; margin-bottom: 1rem; }
+  .body :global(p) { margin-bottom: 0.85rem; max-width: 42rem; }
 
-  @media (max-width: 720px) {
-    .area, .area--flip { grid-template-columns: 1fr; gap: 1rem; }
-    .area--flip .area__media { order: 0; }
-    .area__media img { max-width: 480px; }
+  @media (max-width: 760px) {
+    .area { grid-template-columns: 1fr; gap: 1.25rem; }
+    .area__media { position: static; max-width: 480px; }
   }
 </style>

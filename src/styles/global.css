@@ -1,113 +1,212 @@
 /* ==========================================================================
    Andrechek Lab — global styles & design tokens
-   Edit colors/spacing here; most components use these variables.
-   ========================================================================== */
+   ==========================================================================
 
+   ┌────────────────────────────────────────────────────────────────────┐
+   │  1 · INSTITUTIONAL IDENTITY                                          │
+   │                                                                      │
+   │  These are the ONLY colors to change when re-skinning the site for   │
+   │  a different institution. Every other shade is derived from them     │
+   │  with color-mix() further down — nothing is hand-tweaked or          │
+   │  hardcoded in component files — so a re-theme is a two-line change   │
+   │  here, plus:                                                         │
+   │    • the favicon / institutional logo in  public/                    │
+   │    • the institution name, links & contact in  src/config/site.ts    │
+   └────────────────────────────────────────────────────────────────────┘ */
 :root {
-  /* MSU brand */
-  --green: #18453b;          /* Spartan Green (primary) */
-  --green-dark: #0f2e27;
-  --green-bright: #1f7d5c;   /* interactive / hover accent */
-  --green-tint: #eef3f1;     /* very light green wash for section backgrounds */
+  --brand:  #18453b;   /* official MSU Spartan Green — the one brand color */
+  /* Secondary accent. Defaults to the brand so the palette stays single-color
+     and on-brand; set an independent hue here only if a real secondary is ever
+     wanted (e.g. a new institution's second color). */
+  --accent: var(--brand);
 
-  /* Neutrals */
-  --ink: #16201d;            /* headings */
-  --body: #2c3531;          /* body text */
-  --muted: #5d6b65;         /* secondary text */
-  --bg: #ffffff;
-  --bg-alt: #f5f7f6;
-  --border: #e3eae7;
+  /* Warm paper neutrals — institution-agnostic; rarely need changing. */
+  --bg: #faf7f1;             /* page background (warm paper) */
+  --bg-alt: #f1eee5;         /* alternate section band */
+  --surface: #ffffff;        /* cards / raised panels */
+  --ink: #15211d;            /* headings */
+  --body: #2b3a34;           /* body text */
+  --muted: #5f6f68;          /* secondary text */
 
-  /* Type */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif;
+  /* ====================================================================
+     2 · DERIVED TOKENS — computed from the identity colors above.
+         You normally never edit these by hand.
+     ==================================================================== */
+  --brand-dark:   color-mix(in srgb, var(--brand) 78%, #000);
+  --brand-deep:   color-mix(in srgb, var(--brand) 52%, #000);
+  --brand-tint:   color-mix(in srgb, var(--brand) 12%, var(--bg));
+  --brand-tint-2: color-mix(in srgb, var(--brand) 22%, var(--bg));
+  --accent-tint:  color-mix(in srgb, var(--accent) 13%, var(--bg));
 
-  /* Layout */
-  --maxw: 70rem;
-  --maxw-prose: 46rem;
+  /* Text colors that sit on the dark brand footer */
+  --on-brand:       #f3f7f5;
+  --footer-muted:   color-mix(in srgb, var(--brand) 28%, #ffffff);
+  --footer-faint:   color-mix(in srgb, var(--brand) 46%, #ffffff);
+
+  /* Warm hairlines (kept neutral so they read well on any brand hue) */
+  --border: #e5e1d4;
+  --border-strong: #d2cdbb;
+
+  /* ---- Type ---- */
+  --font-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---- Layout ---- */
+  --maxw: 72rem;
+  --maxw-prose: 44rem;
   --gap: clamp(1rem, 2.5vw, 2rem);
-  --radius: 12px;
+  --radius: 14px;
   --radius-sm: 8px;
-  --shadow: 0 1px 2px rgba(16, 46, 39, 0.06), 0 6px 20px rgba(16, 46, 39, 0.08);
-  --shadow-sm: 0 1px 3px rgba(16, 46, 39, 0.08);
+  --radius-lg: 22px;
 
-  --header-h: 4.25rem;
+  /* ---- Warm, soft shadows ---- */
+  --shadow-sm: 0 1px 2px rgba(16, 38, 31, 0.05), 0 3px 8px rgba(16, 38, 31, 0.04);
+  --shadow: 0 2px 4px rgba(16, 38, 31, 0.05), 0 14px 34px -10px rgba(16, 38, 31, 0.14);
+  --shadow-lg: 0 36px 70px -28px rgba(8, 30, 25, 0.34);
+
+  --nav-h: 4.25rem;                                   /* main nav bar height */
+  --topbar-h: 2.1rem;                                 /* institutional utility strip */
+  --header-h: calc(var(--nav-h) + var(--topbar-h));   /* full sticky header (for scroll offsets) */
+
+  /* Fractal-noise paper grain (inlined SVG, no extra request) */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ----- Reset-ish ----- */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* The canvas color shows in the over-scroll / rubber-band area at both ends.
+     Matches the footer (deep grounding green) so scrolling past it is seamless. */
+  background: var(--brand-deep);
+}
+/* On mobile the utility strip is hidden, so the sticky offset is just the nav bar. */
+@media (max-width: 940px) {
+  :root { --header-h: var(--nav-h); }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+/* Kill transitions mid-resize so the responsive header can't slide across
+   the screen when the viewport crosses the mobile breakpoint. */
+html.is-resizing *, html.is-resizing *::before, html.is-resizing *::after {
+  transition: none !important;
+}
 
 body {
+  position: relative;
   font-family: var(--font-sans);
   color: var(--body);
   background: var(--bg);
   line-height: 1.65;
   font-size: 1.0625rem;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
+/* Fixed paper-grain overlay — sits above everything at a whisper of opacity to
+   add tooth to flat areas (imperceptible on text), and never blocks clicks. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-image: var(--grain);
+  opacity: 0.038;
+  pointer-events: none;
+}
+
 img, picture, svg { max-width: 100%; height: auto; display: block; }
 
-a { color: var(--green); text-decoration: none; }
-a:hover { color: var(--green-bright); text-decoration: underline; text-underline-offset: 2px; }
+::selection { background: var(--brand); color: #fff; }
 
+a { color: var(--brand); text-decoration: none; }
+a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+
+/* ----- Headings: IBM Plex Serif ----- */
 h1, h2, h3, h4 {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   color: var(--ink);
-  line-height: 1.2;
+  font-weight: 600;
+  line-height: 1.16;
   letter-spacing: -0.01em;
-  font-weight: 700;
   text-wrap: balance;
 }
-h1 { font-size: clamp(1.9rem, 1.3rem + 2.4vw, 2.85rem); }
-h2 { font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2rem); }
+h1 {
+  font-size: clamp(2.1rem, 1.4rem + 3.1vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+}
+h2 { font-size: clamp(1.5rem, 1.15rem + 1.6vw, 2.05rem); }
 h3 { font-size: 1.3rem; }
+h4 { font-size: 1.08rem; }
 
 p { text-wrap: pretty; }
 
 /* ----- Layout helpers ----- */
 .container { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gap); }
 .prose { max-width: var(--maxw-prose); }
-.section { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
-.section--alt { background: var(--bg-alt); }
+.section { padding-block: clamp(2.75rem, 6vw, 5rem); }
+.section--alt { background: var(--bg-alt); border-block: 1px solid var(--border); }
 
+/* Reusable editorial section header (eyebrow + heading) */
+.section-head { margin-bottom: 1.75rem; }
+.section-head h2 { margin-top: 0.5rem; }
+
+/* ----- Eyebrow: monospace label with an accent marker ----- */
 .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.62rem;
+  font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--green-bright);
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+.eyebrow::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 1.5px;
+  background: var(--accent);
+  flex: none;
 }
 
 /* ----- Buttons ----- */
 .btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: var(--green); color: #fff;
-  padding: 0.6rem 1.15rem; border-radius: 999px;
-  font-weight: 600; font-size: 0.97rem;
-  border: 1px solid var(--green);
-  transition: background 0.15s ease, transform 0.15s ease;
+  background: var(--brand); color: #fff;
+  padding: 0.68rem 1.25rem; border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-weight: 600; font-size: 0.96rem; letter-spacing: 0.005em;
+  border: 1px solid var(--brand);
+  box-shadow: var(--shadow-sm);
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
-.btn:hover { background: var(--green-dark); color: #fff; text-decoration: none; transform: translateY(-1px); }
-.btn--ghost { background: transparent; color: var(--green); }
-.btn--ghost:hover { background: var(--green-tint); color: var(--green-dark); }
+.btn:hover {
+  background: var(--brand-dark); color: #fff; text-decoration: none;
+  transform: translateY(-2px); box-shadow: var(--shadow);
+}
+.btn--ghost { background: transparent; color: var(--brand); border-color: var(--border-strong); box-shadow: none; }
+.btn--ghost:hover { background: var(--brand-tint); color: var(--brand-dark); border-color: var(--brand); }
 
 /* ----- Accessibility ----- */
 .skip-link {
-  position: absolute; left: 0.5rem; top: -3rem;
-  background: var(--green); color: #fff; padding: 0.6rem 1rem;
-  border-radius: var(--radius-sm); z-index: 200;
+  position: absolute; left: 0.5rem; top: -3.5rem;
+  background: var(--brand); color: #fff; padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm); z-index: 200; font-weight: 600;
   transition: top 0.15s ease;
 }
 .skip-link:focus { top: 0.5rem; color: #fff; }
-:focus-visible { outline: 3px solid var(--green-bright); outline-offset: 2px; border-radius: 3px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
