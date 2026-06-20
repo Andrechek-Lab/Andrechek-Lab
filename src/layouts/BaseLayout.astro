@@ -9,6 +9,10 @@ import '@fontsource-variable/ibm-plex-sans';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/global.css';
+// Preload the two above-the-fold fonts (body sans + the serif H1 weight) so the
+// hero text isn't the LCP waiting on a late font swap.
+import sansBody from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url';
+import serifTitle from '@fontsource/ibm-plex-serif/files/ibm-plex-serif-latin-500-normal.woff2?url';
 import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -42,6 +46,8 @@ const jsonLd = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={sansBody} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifTitle} as="font" type="font/woff2" crossorigin />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -81,17 +87,24 @@ const jsonLd = {
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
 
-    <!-- Google Analytics (GA4) -->
+    <!-- Google Analytics (GA4) — queue the pageview immediately, but defer the
+         67 KB gtag.js until the browser is idle so it doesn't compete with the
+         hero fonts during the critical load (dataLayer replays once it loads). -->
     {ga4 && (
-      <>
-        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`}></script>
-        <script is:inline define:vars={{ ga4 }}>
-          window.dataLayer = window.dataLayer || [];
-          function gtag() { dataLayer.push(arguments); }
-          gtag('js', new Date());
-          gtag('config', ga4);
-        </script>
-      </>
+      <script is:inline define:vars={{ ga4 }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', ga4);
+        var loadGA = function () {
+          if (window.__gaLoaded) return; window.__gaLoaded = 1;
+          var s = document.createElement('script');
+          s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4;
+          document.head.appendChild(s);
+        };
+        if ('requestIdleCallback' in window) requestIdleCallback(loadGA, { timeout: 5000 });
+        else addEventListener('load', function () { setTimeout(loadGA, 1500); });
+      </script>
     )}
 
     <!-- Cloudflare Web Analytics (privacy-friendly; no cookies) -->

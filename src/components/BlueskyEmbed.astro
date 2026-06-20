@@ -41,6 +41,13 @@ const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
     const moreBtn = root && root.querySelector('[data-more]');
     if (!listEl || !moreBtn) return;
 
+    // The embed script injects untitled <iframe>s (nested inside each post's
+    // blockquote) — sweep on every mutation and give each an accessible name.
+    const titleIframes = () => listEl.querySelectorAll('iframe').forEach((f) => {
+      if (!f.title) f.title = 'Bluesky post by Eran Andrechek';
+    });
+    new MutationObserver(titleIframes).observe(listEl, { childList: true, subtree: true });
+
     const HOST = 'https://public.api.bsky.app/xrpc';
     const feedUrl = `${HOST}/app.bsky.feed.getAuthorFeed?actor=${encodeURIComponent(handle)}&limit=30&filter=posts_no_replies`;
     const profUrl = `${HOST}/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`;
@@ -234,7 +241,8 @@ const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
   .bsky__stat { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 
   .bsky__follow {
-    --bsky-blue: #0085ff;
+    /* Bluesky brand blue, darkened just enough for 4.5:1 with white text. */
+    --bsky-blue: #0070dd;
     margin-left: auto;
     display: inline-flex; align-items: center; gap: 0.5rem;
     background: var(--bsky-blue); color: #fff;
@@ -245,7 +253,7 @@ const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
     transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
   }
   .bsky__follow:hover {
-    background: #0073e6; border-color: #0073e6; color: #fff; text-decoration: none;
+    background: #005fc4; border-color: #005fc4; color: #fff; text-decoration: none;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 60, 120, 0.2), 0 12px 26px -8px rgba(0, 110, 220, 0.6);
   }

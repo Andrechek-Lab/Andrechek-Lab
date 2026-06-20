@@ -17,7 +17,8 @@ const total = String(slides.length).padStart(2, '0');
           alt={s.caption}
           widths={[640, 960, 1280]}
           sizes="(max-width: 1000px) 100vw, 1000px"
-          loading="lazy"
+          priority={i === 0}
+          loading={i === 0 ? undefined : 'lazy'}
           decoding="async"
         />
         <figcaption class="gslide__cap">
@@ -141,15 +142,20 @@ const total = String(slides.length).padStart(2, '0');
   .gnav--next { right: 0.8rem; }
 
   .gdots {
-    position: absolute; left: 0; right: 0; bottom: 0.7rem;
-    display: flex; justify-content: center; gap: 0.4rem;
+    position: absolute; left: 0; right: 0; bottom: 0.35rem;
+    display: flex; justify-content: center; gap: 0;
   }
+  /* 24×24 hit target (WCAG 2.5.8) with a small visual dot drawn inside. */
   .gdot {
-    width: 7px; height: 7px; border-radius: 999px; padding: 0; cursor: pointer;
-    border: none; background: color-mix(in srgb, #fff 45%, transparent);
+    width: 24px; height: 24px; padding: 0; cursor: pointer;
+    border: none; background: none; display: grid; place-items: center;
+  }
+  .gdot::before {
+    content: ''; width: 7px; height: 7px; border-radius: 999px;
+    background: color-mix(in srgb, #fff 45%, transparent);
     transition: width 0.2s ease, background 0.2s ease;
   }
-  .gdot[aria-selected='true'] { width: 22px; background: #fff; }
+  .gdot[aria-selected='true']::before { width: 22px; background: #fff; }
 
   @media (hover: none) {
     .gnav { display: none; }

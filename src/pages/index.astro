@@ -1,14 +1,29 @@
 ---
 import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Slideshow from '../components/Slideshow.astro';
 import BlueskyEmbed from '../components/BlueskyEmbed.astro';
 
 const home = (await getCollection('home'))[0];
 const { headline, intro, slides } = home.data;
+
+// The first slideshow image is the LCP element on mobile. Preload it with the
+// same responsive widths the Slideshow renders, so the browser (and Lighthouse's
+// simulated load) fetches it at top priority instead of behind the other slides.
+const slideSizes = '(max-width: 1000px) 100vw, 1000px';
+const lcpImage = await getImage({ src: slides[0].image, widths: [640, 960, 1280] });
 ---
 
 <BaseLayout>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    imagesrcset={lcpImage.srcSet.attribute}
+    imagesizes={slideSizes}
+    fetchpriority="high"
+  />
   <section class="hero">
     <div class="container hero__inner">
       <p class="eyebrow">Andrechek Lab · Michigan State University</p>
