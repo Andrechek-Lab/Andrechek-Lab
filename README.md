@@ -29,7 +29,7 @@ touch the design or the code.
 
 ## What's in here (for the curious)
 
-```
+```txt
 src/
   content/        ← the content you edit (people, research, publications, news, datasets, home)
   pages/          ← the page templates (the layout/design of each page)

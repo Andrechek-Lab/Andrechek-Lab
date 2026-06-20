@@ -3,15 +3,15 @@
    ==========================================================================
 
    ┌────────────────────────────────────────────────────────────────────┐
-   │  1 · INSTITUTIONAL IDENTITY                                          │
-   │                                                                      │
-   │  These are the ONLY colors to change when re-skinning the site for   │
-   │  a different institution. Every other shade is derived from them     │
-   │  with color-mix() further down — nothing is hand-tweaked or          │
-   │  hardcoded in component files — so a re-theme is a two-line change   │
-   │  here, plus:                                                         │
-   │    • the favicon / institutional logo in  public/                    │
-   │    • the institution name, links & contact in  src/config/site.ts    │
+   │  1 · INSTITUTIONAL IDENTITY                                        │
+   │                                                                    │
+   │  These are the ONLY colors to change when re-skinning the site for │
+   │  a different institution. Every other shade is derived from them   │
+   │  with color-mix() further down — nothing is hand-tweaked or        │
+   │  hardcoded in component files — so a re-theme is a two-line change │
+   │  here, plus:                                                       │
+   │    • the favicon / institutional logo in  public/                  │
+   │    • the institution name, links & contact in  src/config/site.ts  │
    └────────────────────────────────────────────────────────────────────┘ */
 :root {
   --brand:  #18453b;   /* official MSU Spartan Green — the one brand color */

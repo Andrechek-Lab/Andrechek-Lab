@@ -1,22 +1,16 @@
 # Editing site content
 
-All the content you'll normally change lives in `src/content/`, as plain markdown
-files — **one file per item**. To add something, copy the `_example.md` file in the
-relevant folder, rename it, and fill it in. To edit something, open its file and
-change the fields. To remove something, delete its file.
+All the content you'll normally change lives in `src/content/`, as plain markdown files — **one file per item**. To add something, copy the `_example.md` file in the relevant folder, rename it, and fill it in. To edit something, open its file and change the fields. To remove something, delete its file.
 
 You can edit these files three ways:
+
 - **On github.com** — click a file, then the ✏️ pencil icon. Good for quick text edits.
 - **On your computer** — see [CONTRIBUTING.md](../CONTRIBUTING.md) for the full setup.
-- Either way, your change goes through a pull request and an automatic check before
-  it's published. If the check fails, **the live site is unaffected** — you just fix
-  the file and push again.
+- Either way, your change goes through a pull request and an automatic check before it's published. If the check fails, **the live site is unaffected** — you just fix the file and push again.
 
-> **About the `---` lines and indentation.** The block between the two `---` lines at
-> the top of each file is called *frontmatter*. It's a list of `field: value` pairs.
-> Keep the field names exactly as shown, and if a value contains a colon `:` or
-> starts with a special character, wrap it in "double quotes". That's the #1 cause of
-> a failed check.
+> **About the `---` lines and indentation.** The block between the two `---` lines at the top of each file is called *frontmatter*.
+> It's a list of `field: value` pairs.
+> Keep the field names exactly as shown, and if a value contains a colon `:` or starts with a special character, wrap it in "double quotes". That's the #1 cause of a failed check.
 
 ---
 
@@ -35,13 +29,11 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the step-by-step.
 | `order` | optional | Lower numbers appear first within a group (PI = 1, current trainees ~10–20, alumni ~30+) |
 | `currentPosition` | alumni only | Where they are now, e.g. `Postdoc, Some University` |
 
-The text below the frontmatter is the person's bio/blurb. Alumni usually have no
-photo and no blurb — just `name`, `group`, and `currentPosition`.
+The text below the frontmatter is the person's bio/blurb. Alumni usually have no photo and no blurb — just `name`, `group`, and `currentPosition`.
 
 ## Publications — `src/content/publications/`
 
-One file per paper (the filename doesn't appear on the site; papers are sorted
-newest-first by `year`).
+One file per paper (the filename doesn't appear on the site; papers are sorted newest-first by `year`).
 
 | Field | Required? | Notes |
 | --- | --- | --- |
@@ -83,20 +75,15 @@ A single file controlling the homepage:
 
 - `headline` — the big heading.
 - `intro` — the mission paragraph under it.
-- `slides` — the rotating photo slideshow. Each slide is an `image:` (a file in this
-  folder) and a `caption:`. Add or remove slides by editing this list.
+- `slides` — the rotating photo slideshow. Each slide is an `image:` (a file in this folder) and a `caption:`. Add or remove slides by editing this list.
 
 ## Supplemental datasets — `src/content/datasets/`
 
-This is the one type with an extra step, because the files are large. The dataset
-**files** are stored on GitHub Releases (not in this repo); the markdown file here
-just lists them and links to them.
+This is the one type with an extra step, because the files are large. The dataset **files** are stored on GitHub Releases (not in this repo); the markdown file here just lists them and links to them.
 
 To add or update a dataset:
 
-1. Upload the file(s) to the GitHub Release — see
-   [docs/infrastructure.md](./infrastructure.md#publishing-datasets) (this is an
-   admin task).
+1. Upload the file(s) to the GitHub Release — see [docs/infrastructure.md](./infrastructure.md) (this is an admin task).
 2. Edit (or copy) a file in `src/content/datasets/`. Each file is one manuscript:
 
    ```yaml
@@ -113,14 +100,10 @@ To add or update a dataset:
    Optional intro paragraph about this manuscript's data.
    ```
 
-   The `href` is always `/data/<exact-file-name>` — our site automatically redirects
-   that to the actual file on the Release.
+   The `href` is always `/data/<exact-file-name>` — our site automatically redirects that to the actual file on the Release.
 
 ---
 
 ## Site-wide settings — `src/config/site.ts`
 
-This is the one file that isn't markdown. It holds the **navigation menu, contact
-details, social links, and analytics IDs**. It changes rarely. It's plain to edit
-(just text between quotes), but if you're unsure, ask an admin —
-[docs/maintainers.md](./maintainers.md) covers it.
+This is the one file that isn't markdown. It holds the **navigation menu, contact details, social links, and analytics IDs**. It changes rarely. It's plain to edit (just text between quotes), but if you're unsure, ask an admin — [docs/maintainers.md](./maintainers.md) covers it.
