@@ -1,0 +1,4 @@
+# Contact page wording. The contact details themselves live in src/config/site.ts.
+meta: Contact information for the {lab} at {institution}.
+eyebrow: Contact
+title: Get in touch

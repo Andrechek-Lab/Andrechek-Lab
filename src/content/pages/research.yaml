@@ -1,0 +1,7 @@
+# Research page wording. The individual research areas (with images) live in
+# src/content/research/.
+meta: Research in the {lab} integrates bioinformatics with mouse models of breast cancer to understand cancer initiation, progression, and metastasis.
+eyebrow: Research
+title: What we study
+lede: >
+  The {lab} is interested in the genomic events that regulate normal development, cancer initiation, and progression. We integrate bioinformatics with mouse models of breast cancer to ask what mechanisms drive normal tissue to become cancerous.

@@ -1,0 +1,11 @@
+# Site-wide chrome shown on every page (footer + Bluesky panel). The footer
+# tagline is the lab's mission line; it lives in src/config/site.ts as {tagline}.
+text:
+  footerTagline: "{tagline}"
+  footerExplore: Explore
+  footerVisit: Visit
+  footerContact: Get in touch
+  footerOpenSource: Open-source on GitHub
+  blueskyEyebrow: Updates
+  blueskyTitle: Latest from Bluesky
+  blueskyFollow: Follow on Bluesky

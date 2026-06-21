@@ -28,7 +28,9 @@ interface Props {
 const { title, description = site.description, ogImage } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.institution}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
-const ogImageUrl = ogImage ? new URL(ogImage, site.url).href : undefined;
+// Every page gets a social-share image (defaults to the generated /og.png).
+const ogImageUrl = new URL(ogImage ?? site.ogImage, site.url).href;
+const ogImageAlt = `${site.name} — ${site.institution}`;
 const { ga4, cloudflareToken } = site.analytics;
 
 const jsonLd = {
@@ -36,7 +38,7 @@ const jsonLd = {
   '@type': 'ResearchOrganization',
   name: site.name,
   url: site.url,
-  parentOrganization: { '@type': 'CollegeOrUniversity', name: site.institution, url: site.msu.url },
+  parentOrganization: { '@type': 'CollegeOrUniversity', name: site.institution, url: site.institutionUrl },
   description: site.description,
 };
 ---
@@ -52,14 +54,23 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- Open Graph / social cards -->
+    <!-- Open Graph / social cards (iMessage, Slack, Facebook, LinkedIn, …) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={title ?? site.name} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />

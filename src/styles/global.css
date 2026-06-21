@@ -14,7 +14,7 @@
    │    • the institution name, links & contact in  src/config/site.ts  │
    └────────────────────────────────────────────────────────────────────┘ */
 :root {
-  --brand:  #18453b;   /* official MSU Spartan Green — the one brand color */
+  --brand:  #18453b;   /* the one brand color (currently MSU Spartan Green) */
   /* Secondary accent. Defaults to the brand so the palette stays single-color
      and on-brand; set an independent hue here only if a real secondary is ever
      wanted (e.g. a new institution's second color). */

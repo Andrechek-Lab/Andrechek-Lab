@@ -1,0 +1,21 @@
+# Template for a page's editable wording. Files starting with "_" are ignored.
+#
+# Every field is optional — keep only the ones a page uses. Inside any text you
+# can use {tokens} that fill in automatically from src/config/site.ts, so you
+# never retype the institution name:
+#
+#   {lab}          → Andrechek Lab
+#   {institution}  → Michigan State University
+#   {pi}           → Eran Andrechek
+#   {department}   → Department of Physiology
+#   {focus}        → breast cancer genomics
+#   {location}     → East Lansing, MI
+#   {tagline}      → the one-line mission statement
+#
+# If a value contains a colon (:) or starts with a special character, wrap it in
+# "double quotes".
+
+meta: One-sentence description used for search engines and social-share previews.
+eyebrow: Small label
+title: The page heading
+lede: The intro paragraph under the heading.

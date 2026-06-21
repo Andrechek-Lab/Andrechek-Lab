@@ -2,7 +2,7 @@
 
 This is the internal, admin-only guide to how the site is hosted and how to perform the one-time setup and occasional maintenance. Lab members editing content do **not** need this — see [editing-content.md](./editing-content.md).
 
-> ⚠️ **Which Cloudflare account?** Everything below must be done in the Cloudflare account that holds the **`andrechek.com`** DNS zone (Eric's personal account) — the same account, so the Worker and the domain live together.
+> ⚠️ **Which Cloudflare account?** Everything below must be done in the Cloudflare account that holds the **`andrechek.com`** DNS zone (the lab's own personal account, **not** a work/organization account) — the same account, so the Worker and the domain live together.
 
 ## Overview
 
@@ -20,17 +20,16 @@ This is the internal, admin-only guide to how the site is hosted and how to perf
 
 ### 1. Publish the datasets to a GitHub Release {#publishing-datasets}
 
-The original dataset zips are staged locally at `~/Code/work/andrechek-lab-data-staging/` (moved out of the repo during the rebuild).
-The Worker is configured to redirect `/data/*` to a release tagged **`datasets-v1`** (see `DOWNLOAD_BASE` in `worker/index.ts`).
+The dataset zips are kept outside the git repo (they're large). The Worker is configured to redirect `/data/*` to a release tagged **`datasets-v1`** (see `DOWNLOAD_BASE` in `worker/index.ts`).
 
-Create that release and upload the files (run from the repo, once it's on GitHub and public):
+Create that release and upload the files (run from your local clone of the repo, once it's on GitHub and public). Replace the staging path with wherever you keep the zips:
 
 ```bash
-cd ~/Code/work/Andrechek-Lab
+cd /path/to/Andrechek-Lab            # your local clone of this repo
 gh release create datasets-v1 \
   --title "Supplemental datasets" \
   --notes "Large supplemental data files for Andrechek Lab manuscripts." \
-  ~/Code/work/andrechek-lab-data-staging/*.zip
+  /path/to/dataset-zips/*.zip        # wherever the .zip files are staged
 ```
 
 That single command creates the release and attaches all ten zips. To add or replace a file later:
@@ -40,8 +39,7 @@ gh release upload datasets-v1 /path/to/New_File.zip          # add one
 gh release upload datasets-v1 /path/to/File.zip --clobber    # replace one
 ```
 
-If you ever cut a *new* release tag, update the one `DOWNLOAD_BASE` line in
-`worker/index.ts` to match.
+If you ever cut a *new* release tag, update the one `DOWNLOAD_BASE` line in `worker/index.ts` to match.
 
 > Download links only work without a login because the repo is **public**.
 > If the repo were private, Release assets would require authentication — use a public archive (e.g. Zenodo) instead and point the `href:` values there.
@@ -92,6 +90,7 @@ Already wired up with Eran's measurement ID `G-WS5FVEQTZ7` in `src/config/site.t
 | --- | --- |
 | Deploy a change | Automatic on merge to `main` (Workers Builds). |
 | Add/replace a dataset file | `gh release upload datasets-v1 …` (see above), then add its entry in `src/content/datasets/`. |
+| Regenerate the social-share image | `pnpm run og`, then commit the updated `public/og.png`. Only needed after changing the lab name, tagline (`src/config/site.ts`), or brand color (`src/styles/global.css`). |
 | Manual deploy | `pnpm run build && wrangler deploy` |
 | Watch a deploy | Cloudflare dashboard → the Worker → **Deployments** / **Builds**. |
 | Tail live logs | `wrangler tail` (observability is enabled in `wrangler.jsonc`). |

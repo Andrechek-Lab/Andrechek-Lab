@@ -1,0 +1,13 @@
+# Home page wording. The big headline, mission paragraph, and slideshow live in
+# src/content/home/home.md; this file holds the surrounding labels and buttons.
+meta: "Professor {pi}'s lab at {institution}, studying the genomic mechanisms that drive the development, progression, and metastasis of breast cancer."
+eyebrow: "{lab} · {institution}"
+actions:
+  - { label: Explore our research, href: /research }
+  - { label: Meet the lab, href: /people }
+badges:
+  - Breast cancer genomics
+  - "{department}"
+  - "{location}"
+text:
+  showcaseLabel: "Fig. 01 — From the bench"

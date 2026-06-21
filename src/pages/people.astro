@@ -3,7 +3,10 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../config/site';
+import { getCopy } from '../lib/copy';
 import alumniGroup from '../assets/images/alumni-group.jpeg';
+
+const copy = await getCopy('people');
 
 const byOrder = (a: { data: { order: number } }, b: { data: { order: number } }) =>
   a.data.order - b.data.order;
@@ -20,11 +23,11 @@ const currentCards = await Promise.all(
 );
 ---
 
-<BaseLayout title="People" description="The people of the Andrechek Lab — principal investigator, current trainees, and alumni.">
+<BaseLayout title={copy.eyebrow} description={copy.meta}>
   <section class="section">
     <div class="container">
-      <p class="eyebrow">People</p>
-      <h1>The lab</h1>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
 
       {piCards.map(({ entry, Content }) => (
         <article class="pi">
@@ -33,7 +36,7 @@ const currentCards = await Promise.all(
           )}
           <div class="pi__body">
             <h2>{entry.data.name}</h2>
-            <p class="pi__role">{entry.data.title} · {site.contact.department}, {site.institution}</p>
+            <p class="pi__role">{entry.data.title} · {site.department}, {site.institution}</p>
             {entry.data.email && (
               <p class="pi__email"><a href={`mailto:${entry.data.email}`}>{entry.data.email}</a></p>
             )}
@@ -47,8 +50,8 @@ const currentCards = await Promise.all(
   <section class="section section--alt">
     <div class="container">
       <div class="section-head">
-        <p class="eyebrow">{current.length} researchers</p>
-        <h2>Current trainees</h2>
+        <p class="eyebrow">{current.length} {copy.text?.researchersLabel}</p>
+        <h2>{copy.sections?.current?.title}</h2>
       </div>
       <div class="roster">
         {currentCards.map(({ entry, Content }) => (
@@ -72,12 +75,12 @@ const currentCards = await Promise.all(
   <section class="section">
     <div class="container">
       <div class="section-head">
-        <p class="eyebrow">Where they are now</p>
-        <h2>Alumni</h2>
+        <p class="eyebrow">{copy.sections?.alumni?.eyebrow}</p>
+        <h2>{copy.sections?.alumni?.title}</h2>
       </div>
       <figure class="alumni-figure">
-        <Image class="alumni-photo" src={alumniGroup} alt="Andrechek Lab alumni" widths={[400, 700]} sizes="(max-width: 520px) 100vw, 440px" />
-        <figcaption>Andrechek Lab alumni</figcaption>
+        <Image class="alumni-photo" src={alumniGroup} alt={copy.text?.alumniCaption ?? `${site.name} alumni`} widths={[400, 700]} sizes="(max-width: 520px) 100vw, 440px" />
+        <figcaption>{copy.text?.alumniCaption}</figcaption>
       </figure>
       <ul class="alumni">
         {alumni.map((p) => (

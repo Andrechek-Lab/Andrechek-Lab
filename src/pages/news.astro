@@ -1,23 +1,25 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCopy } from '../lib/copy';
 
 const all = (await getCollection('news')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const coverage = all.filter((n) => n.data.type === 'coverage');
 const events = all.filter((n) => n.data.type === 'event');
 const fmt = (d: Date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
+const copy = await getCopy('news');
 ---
 
-<BaseLayout title="News & Events" description="News coverage and lab events from the Andrechek Lab.">
+<BaseLayout title={copy.eyebrow} description={copy.meta}>
   <section class="section">
     <div class="container">
-      <p class="eyebrow">News &amp; Events</p>
-      <h1>News &amp; Events</h1>
-      <p class="lede prose">Press coverage of the lab's research, and milestones from the group.</p>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
+      <p class="lede prose">{copy.lede}</p>
 
       <div class="news-grid">
         <div class="news-main">
-          <div class="section-head"><p class="eyebrow">In the news</p><h2>Press coverage</h2></div>
+          <div class="section-head"><p class="eyebrow">{copy.sections?.coverage?.eyebrow}</p><h2>{copy.sections?.coverage?.title}</h2></div>
           <ul class="coverage">
             {coverage.map((n) => (
               <li class="story">
@@ -34,7 +36,7 @@ const fmt = (d: Date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', mon
         </div>
 
         <aside class="news-side">
-          <div class="section-head"><p class="eyebrow">From the lab</p><h2>Milestones</h2></div>
+          <div class="section-head"><p class="eyebrow">{copy.sections?.events?.eyebrow}</p><h2>{copy.sections?.events?.title}</h2></div>
           <ol class="events">
             {events.map((n) => (
               <li class="event">

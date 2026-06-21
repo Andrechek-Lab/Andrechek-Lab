@@ -1,0 +1,11 @@
+# People page wording. The individual people live in src/content/people/.
+meta: The people of the {lab} — principal investigator, current trainees, and alumni.
+eyebrow: People
+title: The lab
+sections:
+  current: { title: Current trainees }
+  alumni: { eyebrow: Where they are now, title: Alumni }
+text:
+  # Shown as "<count> researchers" above the current-trainees grid.
+  researchersLabel: researchers
+  alumniCaption: "{lab} alumni"

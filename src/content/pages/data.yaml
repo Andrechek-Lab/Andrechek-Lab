@@ -1,0 +1,6 @@
+# Supplemental Data page wording. The dataset listings live in src/content/datasets/.
+meta: Supplemental data and detailed methods for {lab} manuscripts, provided for transparency and reproducibility.
+eyebrow: Supplemental Data
+title: Supplemental Data
+lede: >
+  Supplemental information detailing the methods used to generate our genomic analyses is provided for the manuscripts below. We share this to preserve transparency in our research methods and to provide a resource for anyone seeking to reproduce our data.

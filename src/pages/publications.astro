@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCopy } from '../lib/copy';
 
 const pubs = (await getCollection('publications')).sort((a, b) => {
   if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
@@ -10,15 +11,18 @@ const pubs = (await getCollection('publications')).sort((a, b) => {
 // Group into a reverse-chronological timeline by year.
 const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
 const groups = years.map((year) => ({ year, items: pubs.filter((p) => p.data.year === year) }));
+const copy = await getCopy('publications');
 ---
 
-<BaseLayout title="Publications" description="Selected publications from the Andrechek Lab.">
+<BaseLayout title={copy.eyebrow} description={copy.meta}>
   <section class="section">
     <div class="container prose-wide">
-      <p class="eyebrow">Publications</p>
-      <h1>Publications</h1>
-      <p class="lede">Selected papers from the lab. A complete, always-current list is available on PubMed.</p>
-      <p><a class="btn" href="https://www.ncbi.nlm.nih.gov/pubmed/?term=andrechek" rel="noopener">View all papers on PubMed →</a></p>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
+      <p class="lede">{copy.lede}</p>
+      {copy.links?.pubmed && (
+        <p><a class="btn" href={copy.links.pubmed.href} rel="noopener">{copy.links.pubmed.label}</a></p>
+      )}
 
       <div class="timeline">
         {groups.map(({ year, items }) => (
@@ -27,7 +31,7 @@ const groups = years.map((year) => ({ year, items: pubs.filter((p) => p.data.yea
             <ol class="pubs">
               {items.map((p) => (
                 <li class={`pub ${p.data.featured ? 'pub--featured' : ''}`}>
-                  {p.data.featured && <span class="pin">Featured</span>}
+                  {p.data.featured && <span class="pin">{copy.text?.featured}</span>}
                   <h3 class="pub__title"><a href={p.data.url} rel="noopener">{p.data.title}</a></h3>
                   <p class="pub__authors">{p.data.authors}</p>
                   <p class="pub__venue">{p.data.venue}</p>

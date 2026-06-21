@@ -1,20 +1,20 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCopy } from '../lib/copy';
 
 const groups = (await getCollection('datasets')).sort((a, b) => a.data.order - b.data.order);
 const rendered = await Promise.all(groups.map(async (g) => ({ entry: g, Content: (await render(g)).Content })));
 const ext = (href: string) => (href.split('.').pop() || 'file').toUpperCase().slice(0, 4);
+const copy = await getCopy('data');
 ---
 
-<BaseLayout title="Supplemental Data" description="Supplemental data and detailed methods for Andrechek Lab manuscripts, provided for transparency and reproducibility.">
+<BaseLayout title={copy.eyebrow} description={copy.meta}>
   <section class="section">
     <div class="container prose-wide">
-      <p class="eyebrow">Supplemental Data</p>
-      <h1>Supplemental Data</h1>
-      <p class="lede">
-        Supplemental information detailing the methods used to generate our genomic analyses is provided for the manuscripts below. We share this to preserve transparency in our research methods and to provide a resource for anyone seeking to reproduce our data.
-      </p>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
+      <p class="lede">{copy.lede}</p>
 
       {rendered.map(({ entry, Content }) => (
         <article class="dataset">

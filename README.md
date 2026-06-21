@@ -31,12 +31,15 @@ touch the design or the code.
 
 ```txt
 src/
-  content/        ← the content you edit (people, research, publications, news, datasets, home)
+  content/        ← the content you edit
+    people/ research/ publications/ news/ datasets/ home/   ← one file per item
+    pages/        ← the wording on each page (headings, ledes, labels) as YAML
   pages/          ← the page templates (the layout/design of each page)
   components/     ← reusable pieces (header, footer, slideshow, BlueSky feed)
   layouts/        ← the shared page shell (used by every page)
-  config/site.ts  ← site-wide settings: menu, contact info, social links, analytics
+  config/site.ts  ← the lab's core facts + settings: name, institution, menu, contact, analytics
 worker/           ← the Cloudflare Worker that serves the site
+scripts/          ← admin helper(s), e.g. generating the social-share image (not needed for content edits)
 docs/             ← guides for editing, maintaining, and hosting
 .github/          ← the automatic check that runs on every change
 ```

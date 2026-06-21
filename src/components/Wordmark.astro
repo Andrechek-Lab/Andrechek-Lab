@@ -1,12 +1,17 @@
 ---
 /**
  * The lab wordmark — one source of truth so the header and footer always match.
- * Inherits color and font-size from its parent (set those on the wrapper);
- * the two-tone weight is baked in here.
+ * The name comes from site.shortName: the last word renders lighter, the rest
+ * bold (e.g. "Andrechek Lab" → **Andrechek** Lab). Inherits color and font-size
+ * from its parent (set those on the wrapper); the two-tone weight is baked in.
  */
+import { site } from '../config/site';
+const parts = site.shortName.trim().split(/\s+/);
+const secondary = parts.length > 1 ? parts.pop() : '';
+const primary = parts.join(' ');
 ---
 
-<span class="wm"><span class="wm__a">Andrechek</span><span class="wm__b">Lab</span></span>
+<span class="wm"><span class="wm__a">{primary}</span>{secondary && <span class="wm__b">{secondary}</span>}</span>
 
 <style>
   .wm { font-family: var(--font-display); letter-spacing: -0.02em; white-space: nowrap; }

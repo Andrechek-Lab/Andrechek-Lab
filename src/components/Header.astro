@@ -4,18 +4,18 @@ import Wordmark from './Wordmark.astro';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
-const { departmentUrl } = site.contact;
+const { departmentUrl, institutionUrl, institution, department } = site;
 ---
 
 <header class="site-header">
   <!-- Institutional utility strip (desktop) -->
   <div class="topbar">
     <div class="container topbar__inner">
-      <a class="topbar__link" href={withReferral(site.msu.url, 'header')} referrerpolicy="strict-origin-when-cross-origin">{site.msu.name}</a>
+      <a class="topbar__link" href={withReferral(institutionUrl, 'header')} referrerpolicy="strict-origin-when-cross-origin">{institution}</a>
       {departmentUrl ? (
-        <a class="topbar__link topbar__dept" href={withReferral(departmentUrl, 'header')} referrerpolicy="strict-origin-when-cross-origin">{site.contact.department}</a>
+        <a class="topbar__link topbar__dept" href={withReferral(departmentUrl, 'header')} referrerpolicy="strict-origin-when-cross-origin">{department}</a>
       ) : (
-        <span class="topbar__dept">{site.contact.department}</span>
+        <span class="topbar__dept">{department}</span>
       )}
       <a class="topbar__link topbar__mail" href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
     </div>
@@ -41,8 +41,8 @@ const { departmentUrl } = site.contact;
           ))}
         </ul>
         <div class="nav__meta">
-          <a href={withReferral(site.msu.url, 'menu')} referrerpolicy="strict-origin-when-cross-origin">{site.msu.name}</a>
-          {departmentUrl && <a href={withReferral(departmentUrl, 'menu')} referrerpolicy="strict-origin-when-cross-origin">{site.contact.department}</a>}
+          <a href={withReferral(institutionUrl, 'menu')} referrerpolicy="strict-origin-when-cross-origin">{institution}</a>
+          {departmentUrl && <a href={withReferral(departmentUrl, 'menu')} referrerpolicy="strict-origin-when-cross-origin">{department}</a>}
           <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
         </div>
       </nav>
@@ -92,7 +92,7 @@ const { departmentUrl } = site.contact;
 <style>
   .site-header { position: sticky; top: 0; z-index: 100; }
 
-  /* ---- Institutional utility strip (lighter official green) ---- */
+  /* ---- Institutional utility strip (lighter tint of the brand color) ---- */
   .topbar { background: var(--brand); color: color-mix(in srgb, #fff 70%, var(--brand)); }
   .topbar__inner {
     display: flex; align-items: center; gap: 1.1rem;

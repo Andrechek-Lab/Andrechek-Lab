@@ -66,14 +66,17 @@ The check needs no secrets, so it runs safely on pull requests from forks (stude
 
 ## Common settings changes
 
-All in `src/config/site.ts`:
+In `src/config/site.ts` (the lab's core facts + settings):
 
+- **Lab identity** — `name`, `institution`, `department`, `pi`, `focus`, `location`, `tagline`. These are the single source of truth: they flow into every page, the header/footer, the SEO/social tags, and the `{tokens}` used in the page-wording files. Change one here and it updates everywhere.
 - **Navigation menu** — the `nav` list.
 - **Contact info** (address, phones, email, title) — the `contact` block.
 - **Social links** — `social.bluesky`, `social.linkedin`, and `blueskyHandle` (the handle drives the live BlueSky feed on the homepage).
 - **Analytics** — `analytics.ga4` (Google) and `analytics.cloudflareToken` (Cloudflare). See [infrastructure.md](./infrastructure.md).
 
-Editing this file goes through the same PR + check flow as content.
+Page wording (headings, ledes, labels, footer tagline) lives in `src/content/pages/*.yaml` — see [editing-content.md](./editing-content.md#page-wording--srccontentpages). After changing the lab name, institution, or brand color, regenerate the social-share card with `pnpm run og` and commit `public/og.png`.
+
+Editing these goes through the same PR + check flow as content.
 
 ## The `old` branch
 

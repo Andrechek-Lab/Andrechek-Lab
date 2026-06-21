@@ -22,7 +22,10 @@ const people = defineCollection({
       group: z.enum(['pi', 'current', 'alumni']),
       // Role/title, e.g. "Professor", "Graduate Researcher". Optional for alumni.
       title: z.string().optional(),
-      // Photo lives next to this markdown file; reference it as ./photo.jpg
+      // Photo lives next to this markdown file; reference it as ./photo.jpg.
+      // Use a SQUARE (1:1) headshot, at least 400×400px, as a JPG/PNG/WebP — the
+      // site shows it in a round avatar, so a square photo crops cleanly. See the
+      // "Photos" guidance in docs/editing-content.md.
       photo: image().optional(),
       email: z.string().email().optional(),
       // Lower numbers sort first within a group.
@@ -30,6 +33,35 @@ const people = defineCollection({
       // Alumni only: where they are now, e.g. "Assistant Professor, Salk Institute".
       currentPosition: z.string().optional(),
     }),
+});
+
+// --- Page copy: editable wording for each page ------------------------------
+// One YAML file per page in src/content/pages/ (e.g. research.yaml). Holds the
+// headings, ledes, eyebrows, and labels the lab may want to reword, with {tokens}
+// (like {institution}) expanded from src/config/site.ts. All fields are optional;
+// each page reads the ones it needs.
+const pages = defineCollection({
+  loader: glob({ pattern: ['**/*.{yaml,yml}', '!**/_*'], base: './src/content/pages' }),
+  schema: z.object({
+    // SEO/social meta description for the page.
+    meta: z.string().optional(),
+    // The small label above the page title.
+    eyebrow: z.string().optional(),
+    // The page's main heading (H1).
+    title: z.string().optional(),
+    // The intro paragraph under the heading.
+    lede: z.string().optional(),
+    // Call-to-action buttons (used on the home hero).
+    actions: z.array(z.object({ label: z.string(), href: z.string() })).optional(),
+    // Short pills/badges (used on the home hero meta line).
+    badges: z.array(z.string()).optional(),
+    // Named sub-section headers, e.g. sections.current.title.
+    sections: z.record(z.object({ eyebrow: z.string().optional(), title: z.string().optional() })).optional(),
+    // Named links, e.g. links.pubmed.{label,href}.
+    links: z.record(z.object({ label: z.string(), href: z.string() })).optional(),
+    // Escape hatch for one-off labels, e.g. text.showcaseLabel.
+    text: z.record(z.string()).optional(),
+  }),
 });
 
 // --- Research areas ---------------------------------------------------------
@@ -106,4 +138,4 @@ const home = defineCollection({
     }),
 });
 
-export const collections = { people, research, publications, news, datasets, home };
+export const collections = { people, research, publications, news, datasets, home, pages };

@@ -1,14 +1,16 @@
 ---
 import { site } from '../config/site';
+import { getCopy } from '../lib/copy';
 const handle = site.blueskyHandle;
 const profileUrl = site.social.bluesky;
-const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
+const displayName = site.pi;
+const t = (await getCopy('globals')).text ?? {};
 ---
 
 <section class="bsky" aria-label="Latest posts on BlueSky">
   <div class="bsky__head">
-    <p class="eyebrow">Updates</p>
-    <h2 class="bsky__title">Latest from Bluesky</h2>
+    <p class="eyebrow">{t.blueskyEyebrow}</p>
+    <h2 class="bsky__title">{t.blueskyTitle}</h2>
 
     <!-- Profile / follow strip. Counts + avatar are filled in by JS from the
          public AT-Protocol profile; the link + label work without JS. -->
@@ -20,7 +22,7 @@ const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
       </div>
       <a class="bsky__follow" href={profileUrl} rel="me noopener">
         <svg viewBox="0 0 600 530" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M135 75c66 50 137 151 163 205 26-54 97-155 163-205 48-36 125-64 125 24 0 18-10 148-16 169-21 73-95 91-161 80 115 20 145 85 81 150-120 123-173-31-187-66-2-5-4-7-4-2 0-5-2 0-4 2-14 35-67 189-187 66-64-65-34-130 81-150-66 11-140-7-161-80-6-21-16-151-16-169 0-88 77-60 125-24Z"/></svg>
-        <span>Follow on Bluesky</span>
+        <span>{t.blueskyFollow}</span>
       </a>
     </div>
   </div>
@@ -34,7 +36,7 @@ const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
   </div>
 </section>
 
-<script is:inline data-astro-rerun define:vars={{ handle }}>
+<script is:inline data-astro-rerun define:vars={{ handle, author: site.pi }}>
   (function () {
     const root = document.querySelector('.bsky');
     const listEl = root && root.querySelector('[data-embeds]');
@@ -44,7 +46,7 @@ const displayName = site.contact.name.replace(/,.*$/, ''); // "Eran Andrechek"
     // The embed script injects untitled <iframe>s (nested inside each post's
     // blockquote) — sweep on every mutation and give each an accessible name.
     const titleIframes = () => listEl.querySelectorAll('iframe').forEach((f) => {
-      if (!f.title) f.title = 'Bluesky post by Eran Andrechek';
+      if (!f.title) f.title = 'Bluesky post by ' + author;
     });
     new MutationObserver(titleIframes).observe(listEl, { childList: true, subtree: true });
 

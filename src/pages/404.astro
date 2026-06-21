@@ -1,14 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCopy } from '../lib/copy';
+const copy = await getCopy('notfound');
 ---
 
-<BaseLayout title="Page not found">
+<BaseLayout title={copy.title}>
   <section class="section">
     <div class="container notfound">
-      <p class="eyebrow">404</p>
-      <h1>Page not found</h1>
-      <p class="lede">Sorry, we couldn't find that page. It may have moved.</p>
-      <p><a class="btn" href="/">Back to home</a></p>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
+      <p class="lede">{copy.lede}</p>
+      <p><a class="btn" href="/">{copy.text?.back}</a></p>
     </div>
   </section>
 </BaseLayout>

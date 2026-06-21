@@ -1,0 +1,6 @@
+# The 404 "page not found" screen.
+title: Page not found
+eyebrow: "404"
+lede: Sorry, we couldn't find that page. It may have moved.
+text:
+  back: Back to home

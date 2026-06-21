@@ -2,22 +2,20 @@
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCopy } from '../lib/copy';
 
 const areas = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
 const cards = await Promise.all(areas.map(async (a) => ({ entry: a, Content: (await render(a)).Content })));
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const copy = await getCopy('research');
 ---
 
-<BaseLayout title="Research" description="Research in the Andrechek Lab integrates bioinformatics with mouse models of breast cancer to understand cancer initiation, progression, and metastasis.">
+<BaseLayout title={copy.eyebrow} description={copy.meta}>
   <section class="section">
     <div class="container">
-      <p class="eyebrow">Research</p>
-      <h1>What we study</h1>
-      <p class="lede prose">
-        The Andrechek Lab is interested in the genomic events that regulate normal development,
-        cancer initiation, and progression. We integrate bioinformatics with mouse models of breast
-        cancer to ask what mechanisms drive normal tissue to become cancerous.
-      </p>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
+      <p class="lede prose">{copy.lede}</p>
 
       <nav class="jump" aria-label="Research areas">
         {cards.map(({ entry }, i) => (

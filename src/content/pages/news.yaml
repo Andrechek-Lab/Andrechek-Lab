@@ -1,0 +1,8 @@
+# News & Events page wording. The individual items live in src/content/news/.
+meta: News coverage and lab events from the {lab}.
+eyebrow: News & Events
+title: News & Events
+lede: Press coverage of the lab's research, and milestones from the group.
+sections:
+  coverage: { eyebrow: In the news, title: Press coverage }
+  events: { eyebrow: From the lab, title: Milestones }

@@ -1,0 +1,11 @@
+# Publications page wording. The individual papers live in src/content/publications/.
+meta: Selected publications from the {lab}.
+eyebrow: Publications
+title: Publications
+lede: Selected papers from the lab. A complete, always-current list is available on PubMed.
+links:
+  pubmed:
+    label: "View all papers on PubMed →"
+    href: https://www.ncbi.nlm.nih.gov/pubmed/?term=andrechek
+text:
+  featured: Featured

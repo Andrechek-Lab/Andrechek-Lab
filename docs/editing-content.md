@@ -24,12 +24,23 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the step-by-step.
 | `name` | yes | Full name, e.g. `Jane Doe` |
 | `group` | yes | `pi`, `current`, or `alumni` |
 | `title` | for pi/current | Role, e.g. `Graduate Researcher`, `Undergraduate Researcher`, `Professor` |
-| `photo` | optional | `./your-photo.jpg` — the file must be in this folder |
+| `photo` | optional | `./your-photo.jpg` — the file must be in this folder. **See the photo rules below.** |
 | `email` | optional | Shown as a link |
 | `order` | optional | Lower numbers appear first within a group (PI = 1, current trainees ~10–20, alumni ~30+) |
 | `currentPosition` | alumni only | Where they are now, e.g. `Postdoc, Some University` |
 
 The text below the frontmatter is the person's bio/blurb. Alumni usually have no photo and no blurb — just `name`, `group`, and `currentPosition`.
+
+### Photo requirements
+
+The site shows each person in a **round avatar**, so the photo must be a square or it'll look cropped or squished:
+
+- **Shape:** square (1:1 — same width and height). A head-and-shoulders photo works best.
+- **Size:** at least **400 × 400 pixels** (bigger is fine — the site shrinks it). Avoid tiny images; they look blurry.
+- **Format:** `.jpg`, `.png`, or `.webp`.
+- **Cropping to a square:** on a Mac, open the photo in Preview → *Tools → Crop* with a square selection; on Windows, use the Photos app's crop with a 1:1 / square ratio; or any phone photo editor's "square" crop. There are also free web tools (search "crop image to square").
+
+If your photo isn't square, the round avatar will cut off part of it — so crop first.
 
 ## Publications — `src/content/publications/`
 
@@ -102,8 +113,36 @@ To add or update a dataset:
 
    The `href` is always `/data/<exact-file-name>` — our site automatically redirects that to the actual file on the Release.
 
+## Page wording — `src/content/pages/`
+
+The wording shown *around* the content — page headings, the intro line under each heading, the small labels ("eyebrows"), buttons, and the footer tagline — lives here as plain YAML, one file per page (`research.yaml`, `people.yaml`, …). Edit these to reword a page without touching any code.
+
+```yaml
+# src/content/pages/research.yaml
+eyebrow: Research
+title: What we study
+lede: >
+  The {lab} integrates bioinformatics with mouse models of breast cancer…
+```
+
+**Shared facts use `{tokens}`.** So you never retype the institution name (and so a future name change is a one-line edit), any wording can include these placeholders, which fill in automatically:
+
+| Token | Fills in with |
+| --- | --- |
+| `{lab}` | the lab name (Andrechek Lab) |
+| `{institution}` | the university (Michigan State University) |
+| `{pi}` | the PI's name (Eran Andrechek) |
+| `{department}` | the department |
+| `{focus}` | the short research focus |
+| `{location}` | the city/state |
+| `{tagline}` | the one-line mission statement |
+
+The facts themselves live in `src/config/site.ts` (below). `globals.yaml` holds the few labels shared by every page (footer headings, the Bluesky panel title).
+
 ---
 
 ## Site-wide settings — `src/config/site.ts`
 
-This is the one file that isn't markdown. It holds the **navigation menu, contact details, social links, and analytics IDs**. It changes rarely. It's plain to edit (just text between quotes), but if you're unsure, ask an admin — [docs/maintainers.md](./maintainers.md) covers it.
+This is the one file that isn't markdown. It holds the lab's **core facts** (name, institution, department, PI, research focus, location, tagline) — the single source the `{tokens}` above pull from — plus the **navigation menu, contact details, social links, and analytics IDs**. It changes rarely. It's plain to edit (just text between quotes), but if you're unsure, ask an admin — [docs/maintainers.md](./maintainers.md) covers it.
+
+> Changing the lab's name or institution? Update the facts here, then regenerate the social-share image with `pnpm run og` (an admin task — see [infrastructure.md](./infrastructure.md)).

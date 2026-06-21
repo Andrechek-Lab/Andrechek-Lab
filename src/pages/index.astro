@@ -4,9 +4,11 @@ import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Slideshow from '../components/Slideshow.astro';
 import BlueskyEmbed from '../components/BlueskyEmbed.astro';
+import { getCopy } from '../lib/copy';
 
 const home = (await getCollection('home'))[0];
 const { headline, intro, slides } = home.data;
+const copy = await getCopy('index');
 
 // The first slideshow image is the LCP element on mobile. Preload it with the
 // same responsive widths the Slideshow renders, so the browser (and Lighthouse's
@@ -15,7 +17,7 @@ const slideSizes = '(max-width: 1000px) 100vw, 1000px';
 const lcpImage = await getImage({ src: slides[0].image, widths: [640, 960, 1280] });
 ---
 
-<BaseLayout>
+<BaseLayout description={copy.meta}>
   <link
     slot="head"
     rel="preload"
@@ -26,19 +28,21 @@ const lcpImage = await getImage({ src: slides[0].image, widths: [640, 960, 1280]
   />
   <section class="hero">
     <div class="container hero__inner">
-      <p class="eyebrow">Andrechek Lab · Michigan State University</p>
+      <p class="eyebrow">{copy.eyebrow}</p>
       <h1 class="hero__title">{headline}</h1>
       <p class="lede prose">{intro}</p>
       <div class="hero-actions">
-        <a class="btn" href="/research">Explore our research</a>
-        <a class="btn btn--ghost" href="/people">Meet the lab</a>
+        {copy.actions?.map((a, i) => (
+          <a class={i === 0 ? 'btn' : 'btn btn--ghost'} href={a.href}>{a.label}</a>
+        ))}
       </div>
       <p class="hero__meta">
-        <span>Breast cancer genomics</span>
-        <span class="dot" aria-hidden="true"></span>
-        <span>Department of Physiology</span>
-        <span class="dot" aria-hidden="true"></span>
-        <span>East Lansing, MI</span>
+        {copy.badges?.map((b, i) => (
+          <Fragment>
+            {i > 0 && <span class="dot" aria-hidden="true"></span>}
+            <span>{b}</span>
+          </Fragment>
+        ))}
       </p>
     </div>
   </section>
@@ -46,7 +50,7 @@ const lcpImage = await getImage({ src: slides[0].image, widths: [640, 960, 1280]
   <section class="section showcase">
     <div class="container">
       <div class="showcase__inner">
-        <p class="feature__label">Fig. 01 — From the bench</p>
+        <p class="feature__label">{copy.text?.showcaseLabel}</p>
         <Slideshow slides={slides} />
       </div>
     </div>
