@@ -6,7 +6,13 @@ import { getCopy } from '../lib/copy';
 const all = (await getCollection('news')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const coverage = all.filter((n) => n.data.type === 'coverage');
 const events = all.filter((n) => n.data.type === 'event');
-const fmt = (d: Date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
+const fmt = (d: Date, precision: 'day' | 'year' = 'day') =>
+  precision === 'year'
+    ? new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: 'UTC' }).format(d)
+    : new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
+// Machine-readable datetime: full ISO date, or just the year when that's all we know.
+const dt = (d: Date, precision: 'day' | 'year' = 'day') =>
+  precision === 'year' ? String(d.getUTCFullYear()) : d.toISOString().slice(0, 10);
 const copy = await getCopy('news');
 ---
 
@@ -24,7 +30,7 @@ const copy = await getCopy('news');
             {coverage.map((n) => (
               <li class="story">
                 <div class="story__meta">
-                  <time class="story__date" datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
+                  <time class="story__date" datetime={dt(n.data.date, n.data.datePrecision)}>{fmt(n.data.date, n.data.datePrecision)}</time>
                   {n.data.source && <span class="story__outlet">{n.data.source}</span>}
                 </div>
                 <h3 class="story__title">
@@ -40,7 +46,7 @@ const copy = await getCopy('news');
           <ol class="events">
             {events.map((n) => (
               <li class="event">
-                <time class="event__date" datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
+                <time class="event__date" datetime={dt(n.data.date, n.data.datePrecision)}>{fmt(n.data.date, n.data.datePrecision)}</time>
                 <p class="event__title">{n.data.title}</p>
               </li>
             ))}

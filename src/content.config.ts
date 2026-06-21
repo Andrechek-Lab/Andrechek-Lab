@@ -101,6 +101,10 @@ const news = defineCollection({
     // Coverage links out to the article; events usually have no link.
     url: z.string().url().optional(),
     source: z.string().optional(),
+    // When only the year is known (e.g. a thesis defense we have the year but not
+    // the exact day for), set this to "year" to show just the year rather than a
+    // made-up month/day. Defaults to the full date.
+    datePrecision: z.enum(['day', 'year']).default('day'),
   }),
 });
 

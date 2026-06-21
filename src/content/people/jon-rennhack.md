@@ -1,6 +1,6 @@
 ---
 name: Jon Rennhack
 group: alumni
-currentPosition: Postdoc, Bill Hahn Lab
+currentPosition: Assistant Professor, Cancer Biology, Loyola University Chicago
 order: 34
 ---
