@@ -12,7 +12,7 @@
   "compatibility_date": "2026-06-01",
   "workers_dev": true,
   "routes": [
-    { "pattern": "lab.andrechek.com/*", "zone_name": "andrechek.com" }
+    { "pattern": "lab.andrechek.com", "custom_domain": true }
   ],
   "assets": {
     "directory": "./dist",
