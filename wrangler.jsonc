@@ -7,8 +7,13 @@
   // main — you normally don't run wrangler by hand. See docs/infrastructure.md.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "andrechek-lab",
+  "account_id": "a83636122a9deb90dc326f3f97dc891e",
   "main": "worker/index.ts",
   "compatibility_date": "2026-06-01",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "lab.andrechek.com/*", "zone_name": "andrechek.com" }
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
