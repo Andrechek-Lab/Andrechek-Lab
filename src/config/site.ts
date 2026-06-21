@@ -82,7 +82,7 @@ export const site = {
   // created (see docs/infrastructure.md). Leave blank to disable it.
   analytics: {
     ga4: 'G-WS5FVEQTZ7',
-    cloudflareToken: '',
+    cloudflareToken: '2e04a8a3560243d08a07e54fd63bd3a8',
   },
 } as const;
 
